@@ -2,7 +2,7 @@
 
 namespace Feather;
 
-run( 'Test Suite 1',
+run( 'Example Feather Test Suite',
 
     test('Test pass validation method', function ($t) {
         $t->pass();
@@ -13,7 +13,7 @@ run( 'Test Suite 1',
     }),
 
     skip('Test suite test skip method', function ($t) {
-        $t->fail('This shouldt fail, even if failed explicitly');
+        $t->fail('This shouldnt fail, even if failed explicitly');
     }),
 
     test('Test assert validation method passes', function ($t) {
@@ -32,8 +32,8 @@ run( 'Test Suite 1',
     }),
 
     test('Test assertEqual validation method fails', function ($t) {
-        $obj1 = new \stdClass(); $obj1->foo = 1;
-        $obj2 = new \stdClass(); $obj2->foo = 2;
+        $obj1 = new \stdClass(); $obj1->foo = false;
+        $obj2 = new \stdClass(); $obj2->foo = null;
         $t->assertEqual($obj1, $obj2, 'Failed to assert that objects are equal');
     })
 );
