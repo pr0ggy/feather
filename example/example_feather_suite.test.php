@@ -2,38 +2,51 @@
 
 namespace Feather;
 
-run( 'Example Feather Test Suite',
+// consider the following FizzBuzz implementation:
 
-    test('Test pass validation method', function ($t) {
-        $t->pass();
+function fizzBuzz($i)
+{
+    $output = '';
+    if ( $i % 3 == 0 ) $output = 'Fizz';
+    if ( $i % 5 == 0 ) $output .= 'Buzz';
+
+    return ($output ?: $i);
+}
+
+// a Feather test suite for the function may look something like this:
+
+run( 'Function tests',
+
+    test('FizzBuzz returns "Fizz" if given value is a multiple of 3', function ($t) {
+        $multiplesOf3Only = [3, 6, 9, 12, 18];
+        foreach ($multiplesOf3Only as $fizzValue) {
+            $t->assertEqual('Fizz', FizzBuzz($fizzValue),
+                "FizzBuzz failed to return 'Fizz' when given {$fizzValue} (which is a multiple of 3)");
+        }
     }),
 
-    test('Test fail validation method', function ($t) {
-        $t->fail('UH OH...SOMETHING HAPPENED');
+    test('FizzBuzz returns "Buzz" if given value is a multiple of 5', function ($t) {
+        $multplesOf5Only = [5, 10, 20, 25, 35];
+        foreach ($multplesOf5Only as $buzzValue) {
+            $t->assertEqual('Buzz', FizzBuzz($buzzValue),
+                "FizzBuzz failed to return 'Buzz' when given {$buzzValue} (which is a multiple of 5)");
+        }
     }),
 
-    skip('Test suite test skip method', function ($t) {
-        $t->fail('This shouldnt fail, even if failed explicitly');
+    test('FizzBuzz returns "FizzBuzz" if given value is a multiple of 3 and 5', function ($t) {
+        $multiplesOf3And5 = [15, 30, 45, 60, 75];
+        foreach ($multiplesOf3And5 as $fizzBuzzValue) {
+            $t->assertEqual('FizzBuzz', FizzBuzz($fizzBuzzValue),
+                "FizzBuzz failed to return 'FizzBuzz' when given {$fizzBuzzValue} (which is a multiple of 3 and 5)");
+        }
     }),
 
-    test('Test assert validation method passes', function ($t) {
-        $t->assert(true, 'Failed to assert that true is true...');
-    }),
-
-    test('Test assert validation method fails', function ($t) {
-        $t->assert(false, 'Failed to assert that false is true');
-    }),
-
-    test('Test assertEqual validation method passes', function ($t) {
-        $t->assertEqual(false, false, 'Failed to assert that false is false');
-        $t->assertEqual(1, 1, 'Failed to assert that 1 is 1');
-        $t->assertEqual(null, null, 'Failed to assert that null is null');
-        $t->assertEqual([], [], 'Failed to assert that [] matches []');
-    }),
-
-    test('Test assertEqual validation method fails', function ($t) {
-        $obj1 = new \stdClass(); $obj1->foo = false;
-        $obj2 = new \stdClass(); $obj2->foo = null;
-        $t->assertEqual($obj1, $obj2, 'Failed to assert that objects are equal');
+    test('FizzBuzz returns the value if given value is not a multiple of 3 or 5', function ($t) {
+        $doubleDigitPrimes = [11, 13, 17, 19, 23];
+        foreach ($doubleDigitPrimes as $nonFizzBuzzValue) {
+            $t->assertEqual($nonFizzBuzzValue, FizzBuzz($nonFizzBuzzValue),
+                "FizzBuzz failed to return {$nonFizzBuzzValue} string when given {$nonFizzBuzzValue} (which is prime)");
+        }
     })
+
 );
