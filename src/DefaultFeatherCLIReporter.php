@@ -259,5 +259,7 @@ class DefaultFeatherCLIReporter implements SuiteReporter
                 $this->writeBlankLineToOutput();
             }
         }
+
+        $this->writeBlankLineToOutput();
     }
 }
