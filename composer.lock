@@ -388,21 +388,21 @@
         },
         {
             "name": "symfony/console",
-            "version": "v2.8.17",
+            "version": "v2.8.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "f3c234cd8db9f7e520a91d695db7d8bb5daeb7a4"
+                "reference": "81508e6fac4476771275a3f4f53c3fee9b956bfa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/f3c234cd8db9f7e520a91d695db7d8bb5daeb7a4",
-                "reference": "f3c234cd8db9f7e520a91d695db7d8bb5daeb7a4",
+                "url": "https://api.github.com/repos/symfony/console/zipball/81508e6fac4476771275a3f4f53c3fee9b956bfa",
+                "reference": "81508e6fac4476771275a3f4f53c3fee9b956bfa",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.9",
-                "symfony/debug": "~2.7,>=2.7.2|~3.0.0",
+                "symfony/debug": "^2.7.2|~3.0.0",
                 "symfony/polyfill-mbstring": "~1.0"
             },
             "require-dev": {
@@ -445,7 +445,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2017-02-06T12:04:06+00:00"
+            "time": "2017-03-04T11:00:12+00:00"
         },
         {
             "name": "symfony/debug",
@@ -1310,16 +1310,16 @@
         },
         {
             "name": "pr0ggy/nark",
-            "version": "0.2.6",
+            "version": "0.2.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pr0ggy/nark.git",
-                "reference": "18a5b6c6aa4d812bde7e04c56ec250e18116084f"
+                "reference": "f744ba9f76c16d8a7d9232ffee5cfed3a0d3ba59"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pr0ggy/nark/zipball/18a5b6c6aa4d812bde7e04c56ec250e18116084f",
-                "reference": "18a5b6c6aa4d812bde7e04c56ec250e18116084f",
+                "url": "https://api.github.com/repos/pr0ggy/nark/zipball/f744ba9f76c16d8a7d9232ffee5cfed3a0d3ba59",
+                "reference": "f744ba9f76c16d8a7d9232ffee5cfed3a0d3ba59",
                 "shasum": ""
             },
             "require": {
@@ -1355,7 +1355,7 @@
                 "testing",
                 "unit"
             ],
-            "time": "2017-03-04T23:03:38+00:00"
+            "time": "2017-03-14T22:30:45+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
@@ -1636,16 +1636,16 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v3.2.4",
+            "version": "v3.2.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "9724c684646fcb5387d579b4bfaa63ee0b0c64c8"
+                "reference": "093e416ad096355149e265ea2e4cc1f9ee40ab1a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/9724c684646fcb5387d579b4bfaa63ee0b0c64c8",
-                "reference": "9724c684646fcb5387d579b4bfaa63ee0b0c64c8",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/093e416ad096355149e265ea2e4cc1f9ee40ab1a",
+                "reference": "093e416ad096355149e265ea2e4cc1f9ee40ab1a",
                 "shasum": ""
             },
             "require": {
@@ -1687,7 +1687,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2017-02-16T22:46:52+00:00"
+            "time": "2017-03-07T16:47:02+00:00"
         },
         {
             "name": "webmozart/assert",

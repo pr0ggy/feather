@@ -11,6 +11,74 @@ class TestValidatorTest extends TestCase
 
     /**
      * @test
+     * @expectedException \BadMethodCallException
+     */
+    public function callingNonexistentMethod_throwsBadMethodCallException()
+    {
+        $sut = new TestValidator();
+        $sut->assertNumberIsPositive(20);
+    }
+
+    /**
+     * @test
+     */
+    public function allowsCustomValidationMethodsByPassingValidatorDictionaryToConstructor()
+    {
+        $customValidatorMap = [
+            'assertNumberIsPositive' =>
+                function ($i, $message = null) {
+                    if ($i > 0) {
+                        return;
+                    }
+
+                    $message = ($message ?: "Failed to verify that the given number is positive: {$i}");
+                    throw new ValidationFailureException($message);
+                },
+
+            'assertNumberIsPositiveInteger' =>
+                function ($i, $message = null) {
+                    $this->assertNumberIsPositive($i, $message);
+                    if (is_int($i)) {
+                        return;
+                    }
+
+                    $message = ($message ?: "Failed to verify that the given number is a positive integer: {$i}");
+                    throw new ValidationFailureException($message);
+                }
+        ];
+
+        $sut = new TestValidator($customValidatorMap);
+
+        $sut->assertNumberIsPositive(0.25);
+        $sut->assertNumberIsPositiveInteger(25);
+
+        try {
+            $sut->assertNumberIsPositive(-3);
+            $this->fail('Failed to throw a ValidationFailureException from custom validation method');
+        } catch (ValidationFailureException $exception) {
+            $this->assertEquals("Failed to verify that the given number is positive: -3", $exception->getMessage(),
+                'ValidationFailureException thrown as expected from custom validation method, but the generated message was not as expected');
+        }
+
+        try {
+            $sut->assertNumberIsPositiveInteger(3.5);
+            $this->fail('Failed to throw a ValidationFailureException from custom validation method');
+        } catch (ValidationFailureException $exception) {
+            $this->assertEquals("Failed to verify that the given number is a positive integer: 3.5", $exception->getMessage(),
+                'ValidationFailureException thrown as expected from custom validation method, but the generated message was not as expected');
+        }
+
+        try {
+            $sut->assertNumberIsPositiveInteger(-5, "-5 isn't positive, jabroney");
+            $this->fail('Failed to throw a ValidationFailureException from custom validation method');
+        } catch (ValidationFailureException $exception) {
+            $this->assertEquals("-5 isn't positive, jabroney", $exception->getMessage(),
+                'ValidationFailureException thrown as expected from custom validation method, but the generated message was not as expected');
+        }
+    }
+
+    /**
+     * @test
      * @expectedException \Feather\ValidationFailureException
      * @expectedExceptionMessage Validation failure message
      */

@@ -2,6 +2,8 @@
 
 namespace Feather;
 
+use BadMethodCallException;
+
 /**
  * Validator instance that is passed into each test definition callback and used to make assertions
  * during execution of the test case
@@ -10,6 +12,36 @@ namespace Feather;
  */
 class TestValidator
 {
+    /**
+     * dict, validation callback name => validation callback
+     *
+     * Given to the constructor at creation time to attach custom validator methods
+     *
+     * @var array
+     */
+    private $customValidators = []; // dict, validation callback name => validation callback
+
+    public function __construct(array $customValidatorNameToCallbackMap = [])
+    {
+        $this->customValidators = $customValidatorNameToCallbackMap;
+    }
+
+    /**
+     * Magic method used to access custom validation methods defined during construction
+     *
+     * @param  string $methodName the called method name
+     * @param  array  $args       arguments passed during the invocation
+     */
+    public function __call($methodName, $args)
+    {
+        if (isset($this->customValidators[$methodName]) === false) {
+            throw new BadMethodCallException("No validation found with the specified method: {$methodName}");
+        }
+
+        $boundValidatorMethod = $this->customValidators[$methodName]->bindTo($this);
+        $boundValidatorMethod(...$args);
+    }
+
     /**
      * Simple test readability function to explicitly indicate a test passes (though the method
      * itself does nothing)
