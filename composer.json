@@ -14,7 +14,8 @@
     "require-dev": {
         "pr0ggy/nark": "^0.2.0",
         "phpunit/phpunit": "^5.7",
-        "hamcrest/hamcrest-php": "^2.0"
+        "hamcrest/hamcrest-php": "^2.0",
+        "phpdocumentor/phpdocumentor": "2.*"
     },
     "autoload": {
         "psr-4" : {
