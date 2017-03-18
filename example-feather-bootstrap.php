@@ -8,6 +8,7 @@ use Feather\ValidationFailureException;
 
 //
 // 1) register new validator object with custom validators if desired
+//    if no custom validation functions are required, this isn't necessary
 //
 $feather = Context::getInstance();
 $feather->TestValidator = new TestValidator([
@@ -24,6 +25,7 @@ $feather->TestValidator = new TestValidator([
 
 //
 // 2) register custom reporter if desired
+//    leave this step out to use the default command-line reporter
 //    custom reporters must implement Feather\SuiteReporter interface
 //
 /*
