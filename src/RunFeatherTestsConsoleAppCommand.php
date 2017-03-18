@@ -54,7 +54,6 @@ class RunFeatherTestsConsoleAppCommand extends Command
         $feather = Context::getInstance();
 
         // ---------------------- print Feather version and include bootstrap ----------------------
-        $output->writeln(PHP_EOL.'Feather '.FEATHER_VERSION.PHP_EOL);
         $bootstrapPath = $input->getOption('bootstrap');
         if ($bootstrapPath && file_exists($bootstrapPath)) {
             require $bootstrapPath;

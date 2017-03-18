@@ -16,29 +16,6 @@ class RunFeatherTestsConsoleAppCommandTest extends TestCase
     /**
      * @test
      */
-    public function execute_printsFeatherVersionToOutput()
-    {
-        list($command, $commandTester) = $this->createCommandAndTester();
-        $commandTester->execute(array(
-            'command'  => $command->getName(),
-            '--bootstrap' => 'test/fixtures/fake-feather-bootstrap.php'
-        ));
-        $output = $commandTester->getDisplay();
-        $this->assertContains('Feather '.FEATHER_VERSION, $output);
-    }
-
-    private function createCommandAndTester()
-    {
-        $application = new Application();
-        $application->add(new RunFeatherTestsConsoleAppCommand());
-
-        $command = $application->find('run');
-        return [$command, new CommandTester($command)];
-    }
-
-    /**
-     * @test
-     */
     public function execute_printsErrorMessageToOutput_whenNoBootstrapFound()
     {
         list($command, $commandTester) = $this->createCommandAndTester();
@@ -50,6 +27,14 @@ class RunFeatherTestsConsoleAppCommandTest extends TestCase
         $this->assertContains('Error: Could not find specified Feather bootstrap file: test/fixtures/nonexistent-bootstrap.php', $output);
     }
 
+    private function createCommandAndTester()
+    {
+        $application = new Application();
+        $application->add(new RunFeatherTestsConsoleAppCommand());
+
+        $command = $application->find('run');
+        return [$command, new CommandTester($command)];
+    }
 
     /**
      * @test
