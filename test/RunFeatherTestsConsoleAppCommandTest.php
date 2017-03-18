@@ -8,6 +8,9 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use function Nark\createSpyInstanceOf;
 
+/**
+ * @runTestsInSeparateProcesses
+ */
 class RunFeatherTestsConsoleAppCommandTest extends TestCase
 {
     /**
@@ -18,7 +21,7 @@ class RunFeatherTestsConsoleAppCommandTest extends TestCase
         list($command, $commandTester) = $this->createCommandAndTester();
         $commandTester->execute(array(
             'command'  => $command->getName(),
-            '--test-folder' => 'test/fixtures/fake_test_files'
+            '--bootstrap' => 'test/fixtures/fake-feather-bootstrap.php'
         ));
         $output = $commandTester->getDisplay();
         $this->assertContains('Feather '.FEATHER_VERSION, $output);
@@ -36,26 +39,17 @@ class RunFeatherTestsConsoleAppCommandTest extends TestCase
     /**
      * @test
      */
-    public function execute_filtersTestFoldersAndFilesCorrectlyAccordingToSpecifiedPatterns()
+    public function execute_printsErrorMessageToOutput_whenNoBootstrapFound()
     {
         list($command, $commandTester) = $this->createCommandAndTester();
         $commandTester->execute(array(
             'command'  => $command->getName(),
-            '--test-folder' => 'test/fixtures/fake_test_files'
+            '--bootstrap' => 'test/fixtures/nonexistent-bootstrap.php'
         ));
         $output = $commandTester->getDisplay();
-        $this->assertContains('FAKE TEST FILE 1', $output);
-        $this->assertContains('FAKE TEST FILE 2', $output);
-        $this->assertContains('FAKE TEST FILE 3', $output);
-        $this->assertContains('FAKE TEST FILE 4', $output);
-
-        $commandTester->execute(array(
-            'command'  => $command->getName(),
-            '--test-folder' => 'test/fixtures',
-        ));
-        $output = $commandTester->getDisplay();
-        $this->assertContains('FAKE TEST FILE 3', $output);
+        $this->assertContains('Error: Could not find specified Feather bootstrap file: test/fixtures/nonexistent-bootstrap.php', $output);
     }
+
 
     /**
      * @test
@@ -65,30 +59,33 @@ class RunFeatherTestsConsoleAppCommandTest extends TestCase
         list($command, $commandTester) = $this->createCommandAndTester();
         $commandTester->execute(array(
             'command'  => $command->getName(),
-            '--test-folder' => 'test/fixtures/fake_test_files',
-            '--test-file-pattern' => '/.+3\.nonexistent_test\.php/'
+            '--bootstrap' => 'test/fixtures/fake-feather-bootstrap.php'
         ));
+
+        // the fake bootstrap doesn't do anything, so no test will run
         $output = $commandTester->getDisplay();
-        $this->assertContains('No test files found matching the pattern: "/.+3\.nonexistent_test\.php/"', $output);
+        $this->assertContains('No test files found', $output);
     }
 
     /**
      * @test
      */
-    public function execute_printsExecutedTestsSummary_whenTestFilesAreFound()
+    public function execute_printsExecutedTestsSummary_whenTestFilesAreFoundAndSuitesExecuted()
     {
         $fakeSuiteReporter = createSpyInstanceOf('\Feather\SuiteReporter');
         $fakeTestValidator = createSpyInstanceOf('\Feather\TestValidator');
         Context::unregisterSingletonInstance();
         Context::createAndRegisterSingletonWithConstructionArgs($fakeTestValidator, $fakeSuiteReporter);
-        
+        // if suites have been executed, metrics summaries will exist, so lets fake a couple metric summaries
+        $feather = Context::getInstance();
+        $fakeSuiteMetrics = [ [/*fake suite metrics A*/], [/*fake suite metrics B*/] ];
+        $feather->executedSuiteMetrics = $fakeSuiteMetrics;
+
         list($command, $commandTester) = $this->createCommandAndTester();
         $commandTester->execute(array(
             'command'  => $command->getName(),
-            '--test-folder' => 'test/fixtures/fake_test_files'
+            '--bootstrap' => 'test/fixtures/fake-feather-bootstrap.php'
         ));
-
-        $feather = Context::getInstance();
 
         $suiteReporter = $fakeSuiteReporter->reflector();
         $this->assertEquals(1, count($suiteReporter->registerSuiteMetricsSummary($feather->executedSuiteMetrics)), 'a');
