@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @package Feather
  */
-class DefaultFeatherCLIReporter implements SuiteReporter
+class DefaultFeatherCLIReporter implements Reporter
 {
     /**
      * The CLI OutputInterface used to write reported info

@@ -1,3 +1,5 @@
 <?php
 
-/* no op */
+return function ($testResources) {
+    /* no op */
+};

@@ -16,62 +16,65 @@ use RuntimeException;
  * @param  string $suiteDescription the description of the suite defined by all the given tests
  * @param  array  $tests            a packed array of test instances passed to the function
  */
-function run($suiteDescription, ...$suiteTests)
+function runner($suiteDescription, ...$suiteTests)
 {
-    // ------------------------------------ GET FEATHER CONTEXT ------------------------------------
-    $feather = Context::getInstance();
+    return function ($testingResources) use ($suiteDescription, $suiteTests) {
+        $testValidator = $testingResources['validator'];
+        $testReporter = $testingResources['reporter'];
+        $metricsLogger = $testingResources['metricsLogger'];
 
-    // ------------------------------- INITIALIZE SUITE METRICS DATA -------------------------------
-    $suiteMetrics = [
-        'suiteDescription' => $suiteDescription,
-        'passedTestCount' => 0,
-        'failedTests' => [],    // test description to validation exception map
-        'skippedTests' => []    // list of skipped test descriptions
-    ];
+        // ------------------------------- INITIALIZE SUITE METRICS DATA -------------------------------
+        $suiteMetrics = [
+            'suiteDescription' => $suiteDescription,
+            'passedTestCount' => 0,
+            'failedTests' => [],    // test description to validation exception map
+            'skippedTests' => []    // list of skipped test descriptions
+        ];
 
-    // ---------------------------- BEGIN TEST SUITE METRICS RECORDING -----------------------------
-    $suiteMetrics['executionStartTime'] = microtime(true);
-    $feather->suiteReporter->registerSuiteExecutionInitiation($suiteDescription);
+        // ---------------------------- BEGIN TEST SUITE METRICS RECORDING -----------------------------
+        $suiteMetrics['executionStartTime'] = microtime(true);
+        $testReporter->registerSuiteExecutionInitiation($suiteDescription);
 
-    // ------------------------ DETERMINE WHICH TESTS ACTUALLY NEED TO RUN -------------------------
-    $isTestIsolated = function ($test) {
-        return ($test['runMode'] === TEST_MODE_ISOLATED);
-    };
-    $isolatedSuiteTests = array_filter($suiteTests, $isTestIsolated);
-    if (count($isolatedSuiteTests) > 1) {
-        throw new RuntimeException('Attempting to run multiple tests in isolation using the "only" function...only 1 allowed');
-    } elseif (count($isolatedSuiteTests) === 1) {
-        $testsToRun = $isolatedSuiteTests;
-    } else {
-        $testsToRun = $suiteTests;
-    }
-
-    // --------------------------------------- RUN THE TESTS ---------------------------------------
-    foreach ($testsToRun as $test) {
-        try {
-            if ($test['runMode'] === TEST_MODE_SKIPPED) {
-                throw new SkippedTestException();
-            }
-
-            $testDefinition = $test['definition'];
-            $testDefinition($feather->testValidator);
-            ++$suiteMetrics['passedTestCount'];
-            $feather->suiteReporter->registerPassedTest($test['description']);
-        } catch (SkippedTestException $exception) {
-            $suiteMetrics['skippedTests'][] = $test['description'];
-            $feather->suiteReporter->registerSkippedTest($test['description']);
-        } catch (ValidationFailureException $exception) {
-            $suiteMetrics['failedTests'][$test['description']] = $exception;
-            $feather->suiteReporter->registerFailedTest($test['description'], $exception);
-        } catch (\Exception $exception) {
-            $feather->suiteReporter->registerUnexpectedException($exception);
+        // ------------------------ DETERMINE WHICH TESTS ACTUALLY NEED TO RUN -------------------------
+        $isTestIsolated = function ($test) {
+            return ($test['runMode'] === TEST_MODE_ISOLATED);
+        };
+        $isolatedSuiteTests = array_filter($suiteTests, $isTestIsolated);
+        if (count($isolatedSuiteTests) > 1) {
+            throw new RuntimeException('Attempting to run multiple tests in isolation using the "only" function...only 1 allowed');
+        } elseif (count($isolatedSuiteTests) === 1) {
+            $testsToRun = $isolatedSuiteTests;
+        } else {
+            $testsToRun = $suiteTests;
         }
-    }
 
-    // ----------------------------- END TEST SUITE METRICS RECORDING ------------------------------
-    $suiteMetrics['executionEndTime'] = microtime(true);
-    $feather->suiteReporter->registerSuiteExecutionCompletion($suiteDescription, $suiteMetrics);
-    $feather->executedSuiteMetrics[] = $suiteMetrics;
+        // --------------------------------------- RUN THE TESTS ---------------------------------------
+        foreach ($testsToRun as $test) {
+            try {
+                if ($test['runMode'] === TEST_MODE_SKIPPED) {
+                    throw new SkippedTestException();
+                }
+
+                $testDefinition = $test['definition'];
+                $testDefinition($testValidator);
+                ++$suiteMetrics['passedTestCount'];
+                $testReporter->registerPassedTest($test['description']);
+            } catch (SkippedTestException $exception) {
+                $suiteMetrics['skippedTests'][] = $test['description'];
+                $testReporter->registerSkippedTest($test['description']);
+            } catch (ValidationFailureException $exception) {
+                $suiteMetrics['failedTests'][$test['description']] = $exception;
+                $testReporter->registerFailedTest($test['description'], $exception);
+            } catch (\Exception $exception) {
+                $testReporter->registerUnexpectedException($exception);
+            }
+        }
+
+        // ----------------------------- END TEST SUITE METRICS RECORDING ------------------------------
+        $suiteMetrics['executionEndTime'] = microtime(true);
+        $testReporter->registerSuiteExecutionCompletion($suiteDescription, $suiteMetrics);
+        $metricsLogger($suiteMetrics);
+    };
 }
 
 /**
@@ -132,4 +135,9 @@ function createTest($testDescription, callable $testDefinition, $runMode)
         'definition' => $testDefinition,
         'runMode' => $runMode
     ]);
+}
+
+function getVersion()
+{
+    return (json_decode(file_get_contents(dirname(__FILE__).'/../composer.json'), true))['version'];
 }

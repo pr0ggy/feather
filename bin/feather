@@ -6,7 +6,24 @@ namespace Feather;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
+// -------------------------------------- verify PHP version ---------------------------------------
+if (version_compare('5.6.0', PHP_VERSION, '>') && $argv[1] !== '--version') {
+    fwrite(
+        STDERR,
+        sprintf(
+            'This version of Feather is supported on PHP 5.6, PHP 7.0 and PHP 7.1.' . PHP_EOL .
+            'You are using PHP %s (%s).' . PHP_EOL,
+            PHP_VERSION,
+            PHP_BINARY
+        )
+    );
+
+    die(1);
+}
+
 $currentDirectory = __DIR__;
+
+// --------------------------- find and require the composer autoloader ----------------------------
 $potentialAutoloadFiles = [
     "{$currentDirectory}/../../../autoload.php",
     "{$currentDirectory}/../vendor/autoload.php",
@@ -20,14 +37,11 @@ foreach ($potentialAutoloadFiles as $file) {
     }
 }
 
-unset($file);
-unset($potentialAutoloadFiles);
-
 if (defined('COMPOSER_AUTOLOADER') === false) {
-    fwrite(STDERR,
-        'You need to set up the project dependencies using the following commands:' . PHP_EOL .
-        'wget http://getcomposer.org/composer.phar' . PHP_EOL .
-        'php composer.phar install'
+    fwrite(
+        STDERR,
+        'No vendor directory found'.PHP_EOL.
+        'are you sure you installed dependencies via `composer install`?'.PHP_EOL
     );
 
     die(1);
@@ -35,36 +49,23 @@ if (defined('COMPOSER_AUTOLOADER') === false) {
 
 require COMPOSER_AUTOLOADER;
 
-$console = new ConsoleOutput();
+// --------------------------------- create Feather version const ----------------------------------
+// $composer_data = json_decode(file_get_contents("{$currentDirectory}/../composer.json"), true);
+// define('Feather\VERSION', $composer_data['version']);
+define('Feather\VERSION', getVersion());
 
-if (version_compare('5.6.0', PHP_VERSION, '>') && $argv[1] !== '--version') {
-    $console->writeln(
-        sprintf(
-            'This version of Feather is supported on PHP 5.6, PHP 7.0, and PHP 7.1.' . PHP_EOL .
-            'You are using PHP %s (%s).' . PHP_EOL,
-            PHP_VERSION,
-            PHP_BINARY
-        )
-    );
-
-    die(1);
-}
-
-if (ini_get('date.timezone') == false) {
-    ini_set('date.timezone', 'UTC');
-}
-
-$featherApp = new Application('feather');
+// -------------------------- create the Feather app and launcher command --------------------------
+$featherApp = new Application('feather', VERSION);
 $featherRunTestsCommand = new RunFeatherTestsConsoleAppCommand();
 $featherApp->add($featherRunTestsCommand);
 $featherApp->setDefaultCommand($featherRunTestsCommand->getName(), true);
 
-// print Feather version
-$composer_data = json_decode(file_get_contents("{$currentDirectory}/../composer.json"), true);
-$console->writeln(PHP_EOL."Feather {$composer_data['version']}".PHP_EOL);
-
-// unset globals
+// --------------------------------------- clean up globals ----------------------------------------
 unset($currentDirectory);
-unset($console);
+unset($composer_data);
+unset($file);
+unset($potentialAutoloadFiles);
+unset($featherRunTestsCommand);
 
+// ------------------------------------------ run Feather ------------------------------------------
 $featherApp->run();

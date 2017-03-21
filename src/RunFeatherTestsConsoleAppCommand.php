@@ -39,34 +39,34 @@ class RunFeatherTestsConsoleAppCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // ------------ initialize the Feather context (can be customized in bootstrap) ------------
-        try {
-            Context::createAndRegisterSingletonWithConstructionArgs(
-                new TestValidator(),
-                new DefaultFeatherCLIReporter($output)
-            );
-        } catch (RuntimeException $singletonAlreadyRegistered) {
-            // do nothing
-        }
+        // ----------------------- initialize the Feather testing resources ------------------------
+        $metricsLog = [];
+        $testingResources = [
+            'validator'     => new TestValidator(),
+            'reporter'      => new DefaultFeatherCLIReporter($output),
+            'metricsLogger' => function ($metricsToRecord) use (&$metricsLog) {
+                $metricsLog[] = $metricsToRecord;
+            }
+        ];
 
-        $feather = Context::getInstance();
+        // ------------------------------------- print Feather version -------------------------------------
+        $output->writeln(PHP_EOL.'Feather '.VERSION.PHP_EOL);
 
-        // ---------------------- print Feather version and include bootstrap ----------------------
+        // --------------------------------- run Feather bootstrap ---------------------------------
         $bootstrapPath = $input->getOption('bootstrap');
         if ($bootstrapPath && file_exists($bootstrapPath)) {
-            require $bootstrapPath;
+            $bootstrapper = require $bootstrapPath;
+            $bootstrapper($testingResources);
         } else {
             $output->writeln("Error: Could not find specified Feather bootstrap file: {$bootstrapPath}\n\n");
             return;
         }
 
-
-        if (count($feather->executedSuiteMetrics) === 0) {
-            // ------------------------ print message if no files are found ------------------------
+        // ------------------------------------ report results -------------------------------------
+        if (count($metricsLog) === 0) {
             $output->writeln('No test files found'.PHP_EOL);
         } else {
-            // --------------------------- print test execution summary ----------------------------
-            $feather->suiteReporter->registerSuiteMetricsSummary($feather->executedSuiteMetrics);
+            $testingResources['reporter']->registerSuiteMetricsSummary($metricsLog);
         }
     }
 }

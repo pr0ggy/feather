@@ -15,7 +15,7 @@ function fizzBuzz($i)
 
 // a Feather test suite for the function may look something like this:
 
-run( 'Function tests',
+return runner( 'Function tests',
 
     test('FizzBuzz returns "Fizz" if given value is a multiple of 3', function ($t) {
         $multiplesOf3Only = [3, 6, 9, 12, 18];

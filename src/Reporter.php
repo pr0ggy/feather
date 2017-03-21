@@ -7,7 +7,7 @@ namespace Feather;
  *
  * @package Feather
  */
-interface SuiteReporter
+interface Reporter
 {
     /**
      * Called by the test runner just before running the tests within a suite
