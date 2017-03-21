@@ -1,6 +1,6 @@
 <?php
 
-namespace Feather;
+namespace Kase;
 
 // ----------------------------------------- TEST RUN MODES -----------------------------------------
 const TEST_MODE_NORMAL = 1;     // test will run in sequence as normal

@@ -1,9 +1,9 @@
 {
-    "name": "pr0ggy/feather",
-    "description": "A feather-weight unit testing framework for PHP",
-    "version": "1.0.0",
+    "name": "pr0ggy/kase",
+    "description": "A lightweight unit testing framework for PHP",
+    "version": "1.0.1",
     "type": "library",
-    "bin": ["./bin/feather"],
+    "bin": ["./bin/Kase"],
     "keywords": ["php", "unit", "testing", "framework"],
     "license": "GPL",
     "require": {
@@ -22,7 +22,7 @@
     },
     "autoload": {
         "psr-4" : {
-            "Feather\\" : "src/"
+            "Kase\\" : "src/"
         },
         "files": [
             "src/const.php",
@@ -31,7 +31,7 @@
     },
     "autoload-dev": {
         "psr-4" : {
-            "Feather\\Test\\Utils\\" : "test/Utils/"
+            "Kase\\Test\\Utils\\" : "test/Utils/"
         },
         "files": []
     }

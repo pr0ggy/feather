@@ -1,6 +1,6 @@
 <?php
 
-namespace Feather;
+namespace Kase;
 
 class MetricsLog
 {

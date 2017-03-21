@@ -25,7 +25,7 @@
     verbose="false">
 
     <testsuites>
-        <testsuite name="Feather Tests">
+        <testsuite name="Kase Tests">
             <directory>./test</directory>
             <exclude>./test/Utils/fixtures</exclude>
         </testsuite>

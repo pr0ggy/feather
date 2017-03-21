@@ -1,7 +1,7 @@
 <?php
 /**
- * This file is an example of a barebones Feather bootstrap file.  The bootstrap must define and
- * return a callable which takes a single argument--the testing resources passed in from the Feather
+ * This file is an example of a barebones Kase bootstrap file.  The bootstrap must define and
+ * return a callable which takes a single argument--the testing resources passed in from the Kase
  * executable.  If no custom assertions are required and the standard console reporter will suffice,
  * then no adjustments to this resource package will be needed.  With no adjustments needed, the only
  * requirement of the bootstrap function is to find and include test suite files, executing each

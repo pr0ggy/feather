@@ -1,16 +1,16 @@
 <?php
 
-namespace Feather;
+namespace Kase;
 
 use SebastianBergmann\Comparator;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Built-in simple CLI reporter for the Feather testing framework
+ * Built-in simple CLI reporter for the Kase testing framework
  *
- * @package Feather
+ * @package Kase
  */
-class DefaultFeatherCLIReporter implements Reporter
+class DefaultKaseCLIReporter implements Reporter
 {
     /**
      * The CLI OutputInterface used to write reported info

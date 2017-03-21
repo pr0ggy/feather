@@ -1,6 +1,6 @@
 <?php
 
-namespace Feather\Test\Utils;
+namespace Kase\Test\Utils;
 
 use stdClass;
 

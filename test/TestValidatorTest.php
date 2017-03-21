@@ -1,6 +1,6 @@
 <?php
 
-namespace Feather;
+namespace Kase;
 
 use PHPUnit\Framework\TestCase;
 
@@ -79,7 +79,7 @@ class TestValidatorTest extends TestCase
 
     /**
      * @test
-     * @expectedException \Feather\ValidationFailureException
+     * @expectedException \Kase\ValidationFailureException
      * @expectedExceptionMessage Validation failure message
      */
     public function fail_throwsValidationFailureExceptionWithGivenMessage()

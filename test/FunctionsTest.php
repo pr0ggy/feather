@@ -1,6 +1,6 @@
 <?php
 
-namespace Feather;
+namespace Kase;
 
 use PHPUnit\Framework\TestCase;
 use Equip\Structure\Dictionary;
@@ -101,7 +101,7 @@ class FunctionsTest extends TestCase
     {
         $someFakeTests = [];
         $this->assertTrue(is_callable(runner('some test suite description', ...$someFakeTests)),
-            'Feather\run failed to return a callable test suite');
+            'Kase\run failed to return a callable test suite');
     }
 
     /**
@@ -124,8 +124,8 @@ class FunctionsTest extends TestCase
     private function createFakeTestingResources($overrides = [])
     {
         return [
-            'validator'     => (isset($overrides['validator']) ? $overrides['validator'] : createSpyInstanceOf('\Feather\TestValidator')),
-            'reporter'      => (isset($overrides['reporter']) ? $overrides['reporter'] : createSpyInstanceOf('\Feather\Reporter')),
+            'validator'     => (isset($overrides['validator']) ? $overrides['validator'] : createSpyInstanceOf('\Kase\TestValidator')),
+            'reporter'      => (isset($overrides['reporter']) ? $overrides['reporter'] : createSpyInstanceOf('\Kase\Reporter')),
             'metricsLogger' => (isset($overrides['metricsLogger']) ? $overrides['metricsLogger'] : function($metrics) {/*no-op*/})
         ];
     }
@@ -227,7 +227,7 @@ class FunctionsTest extends TestCase
     {
         $someTestValidationFailureException = new ValidationFailureException('some validation failure message');
         $fakeTestingResources = $this->createFakeTestingResources([
-            'validator' => createSpyInstanceOf('\Feather\TestValidator', [
+            'validator' => createSpyInstanceOf('\Kase\TestValidator', [
                 'fail' => \nark\throwsException($someTestValidationFailureException)
             ])
         ]);
@@ -280,7 +280,7 @@ class FunctionsTest extends TestCase
         $someTestValidationFailureException = new ValidationFailureException('some validation failure message');
         $testCaseMetricsLog = [];
         $fakeTestingResources = $this->createFakeTestingResources([
-            'validator' => createSpyInstanceOf('\Feather\TestValidator', [
+            'validator' => createSpyInstanceOf('\Kase\TestValidator', [
                 'fail' => \nark\throwsException($someTestValidationFailureException)
             ]),
             'metricsLogger' => function ($metricsToLog) use (&$testCaseMetricsLog) { $testCaseMetricsLog[] = $metricsToLog; }
@@ -298,7 +298,7 @@ class FunctionsTest extends TestCase
         $sut($fakeTestingResources);
 
         // ASSERT TEST SUITE A METRICS REGISTERED PROPERLY
-        $this->assertCount(1, $testCaseMetricsLog, 'failed to register Suite A execution metrics with Feather context');
+        $this->assertCount(1, $testCaseMetricsLog, 'failed to register Suite A execution metrics with Kase context');
         $expectedRecordedSuiteAMetrics = [
             'suiteDescription' => $suiteADescription,
             'passedTestCount' => 1,
@@ -321,7 +321,7 @@ class FunctionsTest extends TestCase
         $sut($fakeTestingResources);
 
         // ASSERT TEST SUITE B METRICS REGISTERED PROPERLY
-        $this->assertCount(2, $testCaseMetricsLog, 'failed to register Suite B execution metrics with Feather context');
+        $this->assertCount(2, $testCaseMetricsLog, 'failed to register Suite B execution metrics with Kase context');
         $expectedRecordedSuiteBMetrics = [
             'suiteDescription' => $suiteBDescription,
             'passedTestCount' => 1,

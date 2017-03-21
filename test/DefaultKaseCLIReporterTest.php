@@ -1,11 +1,11 @@
 <?php
 
-namespace Feather;
+namespace Kase;
 
 use PHPUnit\Framework\TestCase;
 use function Nark\occurredSequentially;
 
-class DefaultFeatherCLIReporterTest extends TestCase
+class DefaultKaseCLIReporterTest extends TestCase
 {
     /**
      * @test
@@ -13,7 +13,7 @@ class DefaultFeatherCLIReporterTest extends TestCase
     public function registerSuiteExecutionInitiation_reportsSuiteDescription()
     {
         $outputSpy = $this->getOutputInterfaceSpy();
-        $sut = new DefaultFeatherCLIReporter($outputSpy);
+        $sut = new DefaultKaseCLIReporter($outputSpy);
         $someTestSuiteName = 'Test Suite Alpha';
 
         $sut->registerSuiteExecutionInitiation($someTestSuiteName);
@@ -38,7 +38,7 @@ class DefaultFeatherCLIReporterTest extends TestCase
     public function registerPassedTest_reportsDescriptionOfPassingTest()
     {
         $outputSpy = $this->getOutputInterfaceSpy();
-        $sut = new DefaultFeatherCLIReporter($outputSpy);
+        $sut = new DefaultKaseCLIReporter($outputSpy);
         $someTestDescription = 'something happens';
 
         $sut->registerPassedTest($someTestDescription);
@@ -54,7 +54,7 @@ class DefaultFeatherCLIReporterTest extends TestCase
     public function registerSkippedTest_reportsDescriptionOfSkippedTest()
     {
         $outputSpy = $this->getOutputInterfaceSpy();
-        $sut = new DefaultFeatherCLIReporter($outputSpy);
+        $sut = new DefaultKaseCLIReporter($outputSpy);
         $someTestDescription = 'something happens';
 
         $sut->registerSkippedTest($someTestDescription);
@@ -70,7 +70,7 @@ class DefaultFeatherCLIReporterTest extends TestCase
     public function registerFailedTest_reportsTestFailureMessage()
     {
         $outputSpy = $this->getOutputInterfaceSpy();
-        $sut = new DefaultFeatherCLIReporter($outputSpy);
+        $sut = new DefaultKaseCLIReporter($outputSpy);
         $someTestDescription = 'some test description';
         $someValidationFailureMessage = 'this is why it failed';
         $someValidationException = new ValidationFailureException($someValidationFailureMessage);
@@ -88,7 +88,7 @@ class DefaultFeatherCLIReporterTest extends TestCase
 //     public function registerFailedTest_reportsTestFailureMessageAndValueDetails_whenExpectedAndActualValuesGiven()
 //     {
 //         $outputSpy = $this->getOutputInterfaceSpy();
-//         $sut = new DefaultFeatherCLIReporter($outputSpy);
+//         $sut = new DefaultKaseCLIReporter($outputSpy);
 //         $someTestDescription = 'something failed';
 //         $someValidationFailureMessage = 'this is why it failed';
 //         $someExpectedValue = [true];
@@ -125,7 +125,7 @@ class DefaultFeatherCLIReporterTest extends TestCase
     public function registerUnexpectedException_reportsDetailsOnAnUnexpectedException()
     {
         $outputSpy = $this->getOutputInterfaceSpy();
-        $sut = new DefaultFeatherCLIReporter($outputSpy);
+        $sut = new DefaultKaseCLIReporter($outputSpy);
         $someUnexpectedException = new \Exception('something unexpected happened');
 
         $sut->registerUnexpectedException($someUnexpectedException);
@@ -142,7 +142,7 @@ class DefaultFeatherCLIReporterTest extends TestCase
     public function registerSuiteExecutionCompletion_reportsDetailsOnIndividualTestSuiteCompletion()
     {
         $outputSpy = $this->getOutputInterfaceSpy();
-        $sut = new DefaultFeatherCLIReporter($outputSpy);
+        $sut = new DefaultKaseCLIReporter($outputSpy);
         $someSuiteDescription = 'Some Test Suite';
         $someSuiteMetrics = [
             'executionStartTime' => 0,
@@ -181,7 +181,7 @@ class DefaultFeatherCLIReporterTest extends TestCase
     public function registerSuiteMetricsSummary_reportsNothing_whenNoTestsExecuted()
     {
         $outputSpy = $this->getOutputInterfaceSpy();
-        $sut = new DefaultFeatherCLIReporter($outputSpy);
+        $sut = new DefaultKaseCLIReporter($outputSpy);
         $emptySuiteMetricsList = [];
 
         $sut->registerSuiteMetricsSummary($emptySuiteMetricsList);
@@ -197,7 +197,7 @@ class DefaultFeatherCLIReporterTest extends TestCase
     public function registerSuiteMetricsSummary_reportsDetailsOfAllExecutedTestSuites_whenAtLeast1TestExecuted()
     {
         $outputSpy = $this->getOutputInterfaceSpy();
-        $sut = new DefaultFeatherCLIReporter($outputSpy);
+        $sut = new DefaultKaseCLIReporter($outputSpy);
         $someValidationFailureMessage = 'something went wrong';
         $someValidationException = new ValidationFailureException($someValidationFailureMessage);
         $anotherValidationFailureMessage = 'something went wrong again';

@@ -1,6 +1,6 @@
 <?php
 
-namespace Feather;
+namespace Kase;
 
 // consider the following FizzBuzz implementation:
 
@@ -13,7 +13,7 @@ function fizzBuzz($i)
     return ($output ?: $i);
 }
 
-// a Feather test suite for the function may look something like this:
+// a Kase test suite for the function may look something like this:
 
 return runner( 'Function tests',
 

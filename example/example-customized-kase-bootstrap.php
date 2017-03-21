@@ -1,21 +1,21 @@
 <?php
 /**
- * This file is an example of a customized Feather bootstrap file.  The bootstrap must define and
- * return a callable which takes a single argument--the testing resources passed in from the Feather
+ * This file is an example of a customized Kase bootstrap file.  The bootstrap must define and
+ * return a callable which takes a single argument--the testing resources passed in from the Kase
  * executable.  The testing resources package is a simple dictionary with the following keys available
  * for customization:
  *
  *     validator: This is the validation object that will be passed into each test case definition and
- *                used to make assertions within the test case.  Feather ships with a TestValidator
+ *                used to make assertions within the test case.  Kase ships with a TestValidator
  *                class which supports basic assertion methods and is also customizable by passing a
  *                dictionary of <custom_assertion_method_name> => <custom_assertion_method_callback>
  *                to the constructor.  If you wish to replace this validation class with a custom class,
  *                feel free; you write the test cases, so you decide how the validator will be used and
  *                can write your tests to suite any validator you choose.  An example of overriding the
- *                testing resources with a custom Feather\TestValidator instance can be found below.
+ *                testing resources with a custom Kase\TestValidator instance can be found below.
  *
  *      reporter: This is the object which will handle reporting calls from the test runner.  It must
- *                be an object which implements the Feather\SuiteReporter interface.  An ad-hoc example
+ *                be an object which implements the Kase\SuiteReporter interface.  An ad-hoc example
  *                of overriding the testing resources with a custom reporter instance can be found below.
  *
  * Aside from any desired customization of testing resources, the only requirement of the bootstrap
@@ -27,7 +27,7 @@
  */
 
 return function ($testingResources) {
-    // --------- override validator resource to use custom Feather\TestValidator instance ----------
+    // --------- override validator resource to use custom Kase\TestValidator instance ----------
     $customValidationMethods = [
         'assertEvenInteger' =>
             function ($value, $message = 'Failed to assert that the given value was an even integer') {
@@ -38,7 +38,7 @@ return function ($testingResources) {
                 throw new ValidationFailureException($message);
             }
     ];
-    $testingResources['validator'] = new Feather\TestValidator($customValidationMethods);
+    $testingResources['validator'] = new Kase\TestValidator($customValidationMethods);
 
     // -------------- override reporter resource to use some custom reporter instance --------------
     // $testingResources['reporter'] = new AcmeTestReporter();

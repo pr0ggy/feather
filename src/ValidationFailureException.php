@@ -1,11 +1,11 @@
 <?php
 
-namespace Feather;
+namespace Kase;
 
 /**
- * Exception sublcass thrown by a \Feather\TestValidator instance in the event that validation fails
+ * Exception sublcass thrown by a \Kase\TestValidator instance in the event that validation fails
  *
- * @package Feather
+ * @package Kase
  */
 class ValidationFailureException extends \Exception
 {

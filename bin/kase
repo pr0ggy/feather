@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-namespace Feather;
+namespace Kase;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -11,7 +11,7 @@ if (version_compare('5.6.0', PHP_VERSION, '>') && $argv[1] !== '--version') {
     fwrite(
         STDERR,
         sprintf(
-            'This version of Feather is supported on PHP 5.6, PHP 7.0 and PHP 7.1.' . PHP_EOL .
+            'This version of Kase is supported on PHP 5.6, PHP 7.0 and PHP 7.1.' . PHP_EOL .
             'You are using PHP %s (%s).' . PHP_EOL,
             PHP_VERSION,
             PHP_BINARY
@@ -49,23 +49,21 @@ if (defined('COMPOSER_AUTOLOADER') === false) {
 
 require COMPOSER_AUTOLOADER;
 
-// --------------------------------- create Feather version const ----------------------------------
-// $composer_data = json_decode(file_get_contents("{$currentDirectory}/../composer.json"), true);
-// define('Feather\VERSION', $composer_data['version']);
-define('Feather\VERSION', getVersion());
+// --------------------------------- create Kase version const ----------------------------------
+define('Kase\VERSION', getVersion());
 
-// -------------------------- create the Feather app and launcher command --------------------------
-$featherApp = new Application('feather', VERSION);
-$featherRunTestsCommand = new RunFeatherTestsConsoleAppCommand();
-$featherApp->add($featherRunTestsCommand);
-$featherApp->setDefaultCommand($featherRunTestsCommand->getName(), true);
+// -------------------------- create the Kase app and launcher command --------------------------
+$KaseApp = new Application('Kase', VERSION);
+$KaseRunTestsCommand = new RunKaseTestsConsoleAppCommand();
+$KaseApp->add($KaseRunTestsCommand);
+$KaseApp->setDefaultCommand($KaseRunTestsCommand->getName(), true);
 
 // --------------------------------------- clean up globals ----------------------------------------
 unset($currentDirectory);
 unset($composer_data);
 unset($file);
 unset($potentialAutoloadFiles);
-unset($featherRunTestsCommand);
+unset($KaseRunTestsCommand);
 
-// ------------------------------------------ run Feather ------------------------------------------
-$featherApp->run();
+// ------------------------------------------ run Kase ------------------------------------------
+$KaseApp->run();

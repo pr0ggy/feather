@@ -1,3 +1,3 @@
 <?php
 
-define('Feather\VERSION', Feather\getVersion());
+define('Kase\VERSION', Kase\getVersion());

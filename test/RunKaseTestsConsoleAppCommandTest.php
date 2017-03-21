@@ -1,6 +1,6 @@
 <?php
 
-namespace Feather;
+namespace Kase;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
@@ -8,20 +8,20 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use function Nark\createSpyInstanceOf;
 
-class RunFeatherTestsConsoleAppCommandTest extends TestCase
+class RunKaseTestsConsoleAppCommandTest extends TestCase
 {
     /**
      * @test
      */
-    public function execute_printsFeatherVersion()
+    public function execute_printsKaseVersion()
     {
         list($command, $commandTester) = $this->createCommandAndTester();
         $commandTester->execute([
             'command'  => $command->getName(),
-            '--bootstrap' => 'test/fixtures/fake-feather-bootstrap.php'
+            '--bootstrap' => 'test/fixtures/fake-kase-bootstrap.php'
         ]);
         $output = $commandTester->getDisplay();
-        $this->assertContains('Feather '.VERSION, $output);
+        $this->assertContains('Kase '.VERSION, $output);
     }
 
     /**
@@ -35,13 +35,13 @@ class RunFeatherTestsConsoleAppCommandTest extends TestCase
             '--bootstrap' => 'test/fixtures/nonexistent-bootstrap.php'
         ]);
         $output = $commandTester->getDisplay();
-        $this->assertContains('Error: Could not find specified Feather bootstrap file: test/fixtures/nonexistent-bootstrap.php', $output);
+        $this->assertContains('Error: Could not find specified Kase bootstrap file: test/fixtures/nonexistent-bootstrap.php', $output);
     }
 
     private function createCommandAndTester()
     {
         $application = new Application();
-        $application->add(new RunFeatherTestsConsoleAppCommand());
+        $application->add(new RunKaseTestsConsoleAppCommand());
 
         $command = $application->find('run');
         return [$command, new CommandTester($command)];
@@ -55,7 +55,7 @@ class RunFeatherTestsConsoleAppCommandTest extends TestCase
         list($command, $commandTester) = $this->createCommandAndTester();
         $commandTester->execute([
             'command'  => $command->getName(),
-            '--bootstrap' => 'test/fixtures/fake-feather-bootstrap.php'
+            '--bootstrap' => 'test/fixtures/fake-kase-bootstrap.php'
         ]);
 
         // the fake bootstrap doesn't do anything, so no test will run

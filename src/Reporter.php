@@ -1,11 +1,11 @@
 <?php
 
-namespace Feather;
+namespace Kase;
 
 /**
  * Interface defining methods which are used by the test runner to report on testing events
  *
- * @package Feather
+ * @package Kase
  */
 interface Reporter
 {

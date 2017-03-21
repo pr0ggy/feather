@@ -1,6 +1,6 @@
 <?php
 
-namespace Feather;
+namespace Kase;
 
 use BadMethodCallException;
 
@@ -8,7 +8,7 @@ use BadMethodCallException;
  * Validator instance that is passed into each test definition callback and used to make assertions
  * during execution of the test case
  *
- * @package Feather
+ * @package Kase
  */
 class TestValidator
 {
@@ -55,7 +55,7 @@ class TestValidator
      * Explicitly fails the test
      *
      * @param  string $message a message that should explain why the test failed
-     * @throws \Feather\ValidationFailureException whenever the method is called
+     * @throws \Kase\ValidationFailureException whenever the method is called
      */
     public function fail($message = 'Test explicitly failed (This message should ideally be more descriptive...)')
     {
@@ -67,7 +67,7 @@ class TestValidator
      *
      * @param  mixed $value
      * @param  string $message a message that should explain what exactly failed if the value is not truthy
-     * @throws \Feather\ValidationFailureException if the given value is not truthy
+     * @throws \Kase\ValidationFailureException if the given value is not truthy
      */
     public function assert($value, $message = 'Failed to assert that the given value was true')
     {
@@ -81,7 +81,7 @@ class TestValidator
      * @param  mixed $actualValue
      * @param  string $message       a message that should explain what exactly failed if the actual value
      *                               does not match the expected value
-     * @throws \Feather\ValidationFailureException if the given actual value does not match the given
+     * @throws \Kase\ValidationFailureException if the given actual value does not match the given
      *                                            expected value using loose equality
      */
     public function assertEqual($expectedValue, $actualValue, $message = 'Failed to assert that the given values were equal (==)')
@@ -138,7 +138,7 @@ class TestValidator
      * @param  mixed $actualValue
      * @param  string $message       a message that should explain what exactly failed if the actual value
      *                               does not match the expected value
-     * @throws \Feather\ValidationFailureException if the given actual value does not match the given
+     * @throws \Kase\ValidationFailureException if the given actual value does not match the given
      *                                            expected value using strict equality
      */
     public function assertSame($expectedValue, $actualValue, $message = 'Failed to assert that the given values were equal (===)')

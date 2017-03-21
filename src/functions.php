@@ -1,6 +1,6 @@
 <?php
 
-namespace Feather;
+namespace Kase;
 
 use Equip\Structure\UnorderedList;
 use Equip\Structure\Dictionary;

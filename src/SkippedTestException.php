@@ -1,11 +1,11 @@
 <?php
 
-namespace Feather;
+namespace Kase;
 
 /**
  * Exception subclass thrown by the test runner when a test is encountered that should be skipped
  *
- * @package Feather
+ * @package Kase
  */
 class SkippedTestException extends \Exception
 {
