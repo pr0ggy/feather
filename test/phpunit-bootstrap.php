@@ -1,3 +1,3 @@
 <?php
 
-define('Kase\VERSION', Kase\getVersion());
+define('Kase\VERSION', Kase\_getVersion());

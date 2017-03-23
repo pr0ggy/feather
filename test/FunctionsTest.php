@@ -26,7 +26,7 @@ class FunctionsTest extends TestCase
 
         $this->assertEquals(
             $expectedTestStructure,
-            createTest($someTestDescription, $someTestDefinition, $someTestRunMode),
+            _createTest($someTestDescription, $someTestDefinition, $someTestRunMode),
             'created test data structure was not as expected'
         );
     }
@@ -34,12 +34,12 @@ class FunctionsTest extends TestCase
     /**
      * @test
      */
-    public function _test_createsTestDataStructureWithNormalRunMode()
+    public function createTest_createsTestDataStructureWithNormalRunMode()
     {
         $someTestDescription = 'Test A';
         $someTestDefinition = function ($t) { /*do nothing*/ };
 
-        $expectedTestStructure = createTest(
+        $expectedTestStructure =_createTest(
             $someTestDescription,
             $someTestDefinition,
             TEST_MODE_NORMAL
@@ -60,7 +60,7 @@ class FunctionsTest extends TestCase
         $someTestDescription = 'Test A';
         $someTestDefinition = function ($t) { /*do nothing*/ };
 
-        $expectedTestStructure = createTest(
+        $expectedTestStructure =_createTest(
             $someTestDescription,
             $someTestDefinition,
             TEST_MODE_SKIPPED
@@ -81,7 +81,7 @@ class FunctionsTest extends TestCase
         $someTestDescription = 'Test A';
         $someTestDefinition = function ($t) { /*do nothing*/ };
 
-        $expectedTestStructure = createTest(
+        $expectedTestStructure =_createTest(
             $someTestDescription,
             $someTestDefinition,
             TEST_MODE_ISOLATED

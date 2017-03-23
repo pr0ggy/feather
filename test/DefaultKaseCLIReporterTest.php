@@ -10,21 +10,45 @@ class DefaultKaseCLIReporterTest extends TestCase
     /**
      * @test
      */
+    public function registerTestRunnerInitialization_printsKaseVersionToConsole()
+    {
+        $fakeOutput = $this->getOutputInterfaceSpy();
+        $sut = new DefaultKaseCLIReporter($fakeOutput);
+
+        $sut->registerTestRunnerInitialization();
+
+        $outputSpy = $fakeOutput->reflector();
+        $this->assertTrue(
+            occurredSequentially(
+                $outputSpy->writeln(''),
+                $outputSpy->writeln('Kase '.VERSION),
+                $outputSpy->writeln('')
+            ),
+            'reporter did not print the Kase version number to the output interface as expected'
+        );
+    }
+
+    /**
+     * @test
+     */
     public function registerSuiteExecutionInitiation_reportsSuiteDescription()
     {
-        $outputSpy = $this->getOutputInterfaceSpy();
-        $sut = new DefaultKaseCLIReporter($outputSpy);
+        $fakeOutput = $this->getOutputInterfaceSpy();
+        $sut = new DefaultKaseCLIReporter($fakeOutput);
         $someTestSuiteName = 'Test Suite Alpha';
 
         $sut->registerSuiteExecutionInitiation($someTestSuiteName);
 
-        $output = $outputSpy->reflector();
-        $this->assertTrue(occurredSequentially(
-            $output->writeln('///////////////////////////////////////////'),
-            $output->writeln('//'),
-            $output->writeln("//  {$someTestSuiteName}"),
-            $output->writeln('//')
-        ), 'reporter did not print the test suite header to the output interface as expected');
+        $outputSpy = $fakeOutput->reflector();
+        $this->assertTrue(
+            occurredSequentially(
+                $outputSpy->writeln('///////////////////////////////////////////'),
+                $outputSpy->writeln('//'),
+                $outputSpy->writeln("//  {$someTestSuiteName}"),
+                $outputSpy->writeln('//')
+            ),
+            'reporter did not print the test suite header to the output interface as expected'
+        );
     }
 
     private function getOutputInterfaceSpy()
@@ -37,15 +61,18 @@ class DefaultKaseCLIReporterTest extends TestCase
      */
     public function registerPassedTest_reportsDescriptionOfPassingTest()
     {
-        $outputSpy = $this->getOutputInterfaceSpy();
-        $sut = new DefaultKaseCLIReporter($outputSpy);
+        $fakeOutput = $this->getOutputInterfaceSpy();
+        $sut = new DefaultKaseCLIReporter($fakeOutput);
         $someTestDescription = 'something happens';
 
         $sut->registerPassedTest($someTestDescription);
 
-        $output = $outputSpy->reflector();
-        $this->assertEquals(1, count($output->writeln("<info>[PASS] {$someTestDescription}</info>")),
-            'reporter did not print the passing test info to the output interface as expected');
+        $outputSpy = $fakeOutput->reflector();
+        $this->assertEquals(
+            1,
+            count($outputSpy->writeln("<info>[PASS] {$someTestDescription}</info>")),
+            'reporter did not print the passing test info to the output interface as expected'
+        );
     }
 
     /**
@@ -53,15 +80,18 @@ class DefaultKaseCLIReporterTest extends TestCase
      */
     public function registerSkippedTest_reportsDescriptionOfSkippedTest()
     {
-        $outputSpy = $this->getOutputInterfaceSpy();
-        $sut = new DefaultKaseCLIReporter($outputSpy);
+        $fakeOutput = $this->getOutputInterfaceSpy();
+        $sut = new DefaultKaseCLIReporter($fakeOutput);
         $someTestDescription = 'something happens';
 
         $sut->registerSkippedTest($someTestDescription);
 
-        $output = $outputSpy->reflector();
-        $this->assertEquals(1, count($output->writeln("<comment>[SKIP] {$someTestDescription}</comment>")),
-            'reporter did not print the skipped test info to the output interface as expected');
+        $outputSpy = $fakeOutput->reflector();
+        $this->assertEquals(
+            1,
+            count($outputSpy->writeln("<comment>[SKIP] {$someTestDescription}</comment>")),
+            'reporter did not print the skipped test info to the output interface as expected'
+        );
     }
 
     /**
@@ -69,70 +99,63 @@ class DefaultKaseCLIReporterTest extends TestCase
      */
     public function registerFailedTest_reportsTestFailureMessage()
     {
-        $outputSpy = $this->getOutputInterfaceSpy();
-        $sut = new DefaultKaseCLIReporter($outputSpy);
+        $fakeOutput = $this->getOutputInterfaceSpy();
+        $sut = new DefaultKaseCLIReporter($fakeOutput);
         $someTestDescription = 'some test description';
         $someValidationFailureMessage = 'this is why it failed';
         $someValidationException = new ValidationFailureException($someValidationFailureMessage);
 
         $sut->registerFailedTest($someTestDescription, $someValidationException);
 
-        $output = $outputSpy->reflector();
-        $this->assertCount(1, $output->writeln("<error>[FAIL] {$someTestDescription}</error>"),
-            'reporter did not print the failed test info to the output interface as expected');
+        $outputSpy = $fakeOutput->reflector();
+        $this->assertCount(
+            1,
+            $outputSpy->writeln("<error>[FAIL] {$someTestDescription}</error>"),
+            'reporter did not print the failed test info to the output interface as expected'
+        );
     }
 
-//     /**
-//      * @test
-//      */
-//     public function registerFailedTest_reportsTestFailureMessageAndValueDetails_whenExpectedAndActualValuesGiven()
-//     {
-//         $outputSpy = $this->getOutputInterfaceSpy();
-//         $sut = new DefaultKaseCLIReporter($outputSpy);
-//         $someTestDescription = 'something failed';
-//         $someValidationFailureMessage = 'this is why it failed';
-//         $someExpectedValue = [true];
-//         $someActualValue = [false];
-//         $someValidationException = new ValidationFailureException(
-//             $someValidationFailureMessage,
-//             $someExpectedValue,
-//             $someActualValue
-//         );
+    /**
+     * @test
+     */
+    public function registerFailedTest_reportsTestFailureMessageAndValueDetails_whenExpectedAndActualValuesGiven()
+    {
+        $fakeOutput = $this->getOutputInterfaceSpy();
+        $sut = new DefaultKaseCLIReporter($fakeOutput);
+        $someTestDescription = 'something failed';
+        $someValidationFailureMessage = 'this is why it failed';
+        $someExpectedValue = [true];
+        $someActualValue = [false];
+        $someValidationException = new ValidationFailureException(
+            $someValidationFailureMessage,
+            $someExpectedValue,
+            $someActualValue
+        );
 
-//         $sut->registerFailedTest($someTestDescription, $someValidationException);
+        $sut->registerFailedTest($someTestDescription, $someValidationException);
 
-//         $output = $outputSpy->reflector();
-//         $this->assertTrue(occurredSequentially(
-//             $output->writeln(""),
-//             $output->writeln("<error>[FAIL] {$someTestDescription}</error>"),
-//             $output->write("<error>{$someValidationFailureMessage}</error>"),
-//             $output->writeln("<error>
-// --- Expected
-// +++ Actual
-// @@ @@
-//  Array (
-// -    0 => true
-// +    0 => false
-//  )
-// </error>"
-//             )
-//         ), 'reporter did not print the failed test info to the output interface as expected');
-//     }
+        $outputSpy = $fakeOutput->reflector();
+        $this->assertCount(
+            1,
+            $outputSpy->writeln("<error>[FAIL] {$someTestDescription}</error>"),
+            'reporter did not print the failed test info to the output interface as expected'
+        );
+    }
 
     /**
      * @test
      */
     public function registerUnexpectedException_reportsDetailsOnAnUnexpectedException()
     {
-        $outputSpy = $this->getOutputInterfaceSpy();
-        $sut = new DefaultKaseCLIReporter($outputSpy);
+        $fakeOutput = $this->getOutputInterfaceSpy();
+        $sut = new DefaultKaseCLIReporter($fakeOutput);
         $someUnexpectedException = new \Exception('something unexpected happened');
 
         $sut->registerUnexpectedException($someUnexpectedException);
 
-        $output = $outputSpy->reflector();
+        $outputSpy = $fakeOutput->reflector();
         $this->assertTrue(occurredSequentially(
-            $output->writeln("<error>[FAIL] Unexpected {$someUnexpectedException}</error>")
+            $outputSpy->writeln("<error>[FAIL] Unexpected {$someUnexpectedException}</error>")
         ), 'reporter did not print the unexpected exception message to the output interface as expected');
     }
 
@@ -141,8 +164,8 @@ class DefaultKaseCLIReporterTest extends TestCase
      */
     public function registerSuiteExecutionCompletion_reportsDetailsOnIndividualTestSuiteCompletion()
     {
-        $outputSpy = $this->getOutputInterfaceSpy();
-        $sut = new DefaultKaseCLIReporter($outputSpy);
+        $fakeOutput = $this->getOutputInterfaceSpy();
+        $sut = new DefaultKaseCLIReporter($fakeOutput);
         $someSuiteDescription = 'Some Test Suite';
         $someSuiteMetrics = [
             'executionStartTime' => 0,
@@ -164,31 +187,37 @@ class DefaultKaseCLIReporterTest extends TestCase
         $expectedFailedTestCount = 1;
         $expectedSkippedTestCount = 2;
 
-        $output = $outputSpy->reflector();
-        $this->assertTrue(occurredSequentially(
-            $output->writeln('//'),
-            $output->writeln("// {$someSuiteDescription} tested in {$expectedDurationInSeconds} seconds"),
-            $output->writeln("// <info>{$expectedPassedTestCount}</info> Passed, <error>{$expectedFailedTestCount}</error> Failed, <comment>{$expectedSkippedTestCount}</comment> Skipped"),
-            $output->writeln('///////////////////////////////////////////'),
-            $output->writeln(''),
-            $output->writeln('')
-        ), 'reporter did not print the suite summary as expected');
+        $outputSpy = $fakeOutput->reflector();
+        $this->assertTrue(
+            occurredSequentially(
+                $outputSpy->writeln('//'),
+                $outputSpy->writeln("// {$someSuiteDescription} tested in {$expectedDurationInSeconds} seconds"),
+                $outputSpy->writeln("// <info>{$expectedPassedTestCount}</info> Passed, <error>{$expectedFailedTestCount}</error> Failed, <comment>{$expectedSkippedTestCount}</comment> Skipped"),
+                $outputSpy->writeln('///////////////////////////////////////////'),
+                $outputSpy->writeln(''),
+                $outputSpy->writeln('')
+            ),
+            'reporter did not print the suite summary as expected'
+        );
     }
 
     /**
      * @test
      */
-    public function registerSuiteMetricsSummary_reportsNothing_whenNoTestsExecuted()
+    public function registerSuiteMetricsSummary_reportsWarning_whenNoTestsExecuted()
     {
-        $outputSpy = $this->getOutputInterfaceSpy();
-        $sut = new DefaultKaseCLIReporter($outputSpy);
+        $fakeOutput = $this->getOutputInterfaceSpy();
+        $sut = new DefaultKaseCLIReporter($fakeOutput);
         $emptySuiteMetricsList = [];
 
         $sut->registerSuiteMetricsSummary($emptySuiteMetricsList);
 
-        $output = $outputSpy->reflector();
-        $this->assertEquals(count($output->writeln), 0,
-            'reporter sent output to console when no output was expected');
+        $outputSpy = $fakeOutput->reflector();
+        $this->assertCount(
+            1,
+            $outputSpy->writeln('No test files found'),
+            'reporter did not send tests not found warning to output as expected'
+        );
     }
 
     /**
@@ -196,12 +225,20 @@ class DefaultKaseCLIReporterTest extends TestCase
      */
     public function registerSuiteMetricsSummary_reportsDetailsOfAllExecutedTestSuites_whenAtLeast1TestExecuted()
     {
-        $outputSpy = $this->getOutputInterfaceSpy();
-        $sut = new DefaultKaseCLIReporter($outputSpy);
+        $fakeOutput = $this->getOutputInterfaceSpy();
+        $sut = new DefaultKaseCLIReporter($fakeOutput);
         $someValidationFailureMessage = 'something went wrong';
         $someValidationException = new ValidationFailureException($someValidationFailureMessage);
+        
         $anotherValidationFailureMessage = 'something went wrong again';
-        $anotherValidationException = new ValidationFailureException($anotherValidationFailureMessage);
+        $someExpectedValue = [true];
+        $someActualValue = [false];
+        $anotherValidationException = new ValidationFailureException(
+            $anotherValidationFailureMessage,
+            $someExpectedValue,
+            $someActualValue
+        );
+        
         $suiteMetricsList = [
             // some suite A
             [
@@ -239,22 +276,35 @@ class DefaultKaseCLIReporterTest extends TestCase
         $expectedFailedTestCount = 2;
         $expectedSkippedTestCount = 3;
 
-        $output = $outputSpy->reflector();
-        $this->assertTrue(occurredSequentially(
-            $output->writeln('///////////////////////////////////////////'),
-            $output->writeln('//'),
-            $output->writeln('//  TESTING SUMMARY'),
-            $output->writeln('//'),
-            $output->writeln("// <info>{$expectedPassedTestCount}</info> Passed, <error>{$expectedFailedTestCount}</error> Failed, <comment>{$expectedSkippedTestCount}</comment> Skipped"),
-            $output->writeln("// Completed in {$expectedTotalDurationInSeconds} seconds"),
-            $output->writeln(''),
-            $output->writeln('In Some Suite A:'),
-            $output->writeln('<error>[FAIL] failed test 1</error>'),
-            $output->write("<error>{$someValidationFailureMessage}</error>"),
-            $output->writeln(''),
-            $output->writeln(''),
-            $output->writeln('<error>[FAIL] failed test 2</error>'),
-            $output->write("<error>{$anotherValidationFailureMessage}</error>")
-        ), 'reporter did not print the overall suite execution summary as expected');
+        $outputSpy = $fakeOutput->reflector();
+        $this->assertTrue(
+            occurredSequentially(
+                $outputSpy->writeln('///////////////////////////////////////////'),
+                $outputSpy->writeln('//'),
+                $outputSpy->writeln('//  TESTING SUMMARY'),
+                $outputSpy->writeln('//'),
+                $outputSpy->writeln("// <info>{$expectedPassedTestCount}</info> Passed, <error>{$expectedFailedTestCount}</error> Failed, <comment>{$expectedSkippedTestCount}</comment> Skipped"),
+                $outputSpy->writeln("// Completed in {$expectedTotalDurationInSeconds} seconds"),
+                $outputSpy->writeln(''),
+                $outputSpy->writeln('In Some Suite A:'),
+                $outputSpy->writeln('<error>[FAIL] failed test 1</error>'),
+                $outputSpy->write("<error>{$someValidationFailureMessage}</error>"),
+                $outputSpy->writeln(''),
+                $outputSpy->writeln(''),
+                $outputSpy->writeln('<error>[FAIL] failed test 2</error>'),
+                $outputSpy->write("<error>{$anotherValidationFailureMessage}</error>"),
+                $outputSpy->writeln(
+"<error>
+--- Expected
++++ Actual
+@@ @@
+ Array (
+-    0 => true
++    0 => false
+ )
+</error>")
+            ),
+            'reporter did not print the overall suite execution summary as expected'
+        );
     }
 }

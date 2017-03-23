@@ -6,7 +6,7 @@ namespace Kase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
-// -------------------------------------- verify PHP version ---------------------------------------
+// VERIFY PHP VERSION
 if (version_compare('5.6.0', PHP_VERSION, '>') && $argv[1] !== '--version') {
     fwrite(
         STDERR,
@@ -23,7 +23,7 @@ if (version_compare('5.6.0', PHP_VERSION, '>') && $argv[1] !== '--version') {
 
 $currentDirectory = __DIR__;
 
-// --------------------------- find and require the composer autoloader ----------------------------
+// FIND AND REQUIRE THE COMPOSER AUTOLOADER
 $potentialAutoloadFiles = [
     "{$currentDirectory}/../../../autoload.php",
     "{$currentDirectory}/../vendor/autoload.php",
@@ -49,21 +49,21 @@ if (defined('COMPOSER_AUTOLOADER') === false) {
 
 require COMPOSER_AUTOLOADER;
 
-// --------------------------------- create Kase version const ----------------------------------
-define('Kase\VERSION', getVersion());
+// CREATE KASE VERSION CONST
+define('Kase\VERSION', _getVersion());
 
-// -------------------------- create the Kase app and launcher command --------------------------
+// CREATE KASE APP AND LAUNCHER COMMAND
 $KaseApp = new Application('Kase', VERSION);
 $KaseRunTestsCommand = new RunKaseTestsConsoleAppCommand();
 $KaseApp->add($KaseRunTestsCommand);
 $KaseApp->setDefaultCommand($KaseRunTestsCommand->getName(), true);
 
-// --------------------------------------- clean up globals ----------------------------------------
+// CLEANUP GLOBALS
 unset($currentDirectory);
 unset($composer_data);
 unset($file);
 unset($potentialAutoloadFiles);
 unset($KaseRunTestsCommand);
 
-// ------------------------------------------ run Kase ------------------------------------------
+// RUN KASE
 $KaseApp->run();

@@ -13,20 +13,6 @@ class RunKaseTestsConsoleAppCommandTest extends TestCase
     /**
      * @test
      */
-    public function execute_printsKaseVersion()
-    {
-        list($command, $commandTester) = $this->createCommandAndTester();
-        $commandTester->execute([
-            'command'  => $command->getName(),
-            '--bootstrap' => 'test/fixtures/fake-kase-bootstrap.php'
-        ]);
-        $output = $commandTester->getDisplay();
-        $this->assertContains('Kase '.VERSION, $output);
-    }
-
-    /**
-     * @test
-     */
     public function execute_printsErrorMessageToOutput_whenNoBootstrapFound()
     {
         list($command, $commandTester) = $this->createCommandAndTester();
@@ -45,21 +31,5 @@ class RunKaseTestsConsoleAppCommandTest extends TestCase
 
         $command = $application->find('run');
         return [$command, new CommandTester($command)];
-    }
-
-    /**
-     * @test
-     */
-    public function execute_printsWarningMessageToOutput_whenNoTestFilesFound()
-    {
-        list($command, $commandTester) = $this->createCommandAndTester();
-        $commandTester->execute([
-            'command'  => $command->getName(),
-            '--bootstrap' => 'test/fixtures/fake-kase-bootstrap.php'
-        ]);
-
-        // the fake bootstrap doesn't do anything, so no test will run
-        $output = $commandTester->getDisplay();
-        $this->assertContains('No test files found', $output);
     }
 }

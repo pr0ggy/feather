@@ -18,69 +18,11 @@ Kase takes design inspiration from the [Tape](https://github.com/substack/tape) 
 ### Running Kase
 	./vendor/bin/kase run -b [bootstrap file, default: ./kase-bootstrap.php]
 
-### <a name="example_bootstrap"></a>Example Kase Bootstrap File
-*Kase relies on a user-defined bootstrap file to customize testing resources as needed and include test files.  Check the `example` folder for a couple different example bootstrap files.*
-
-```php
-<?php
-/**
- * This file is an example of a customized Kase bootstrap file.  The bootstrap must define and
- * return a callable which takes a single argument--the testing resources passed in from the Kase
- * executable.  The testing resources package is a simple dictionary with the following keys available
- * for customization:
- *
- *     validator: This is the validation object that will be passed into each test case definition and
- *                used to make assertions within the test case.  Kase ships with a TestValidator
- *                class which supports basic assertion methods and is also customizable by passing a
- *                dictionary of <custom_assertion_method_name> => <custom_assertion_method_callback>
- *                to the constructor.  If you wish to replace this validation class with a custom class,
- *                feel free; you write the test cases, so you decide how the validator will be used and
- *                can write your tests to suite any validator you choose.  An example of overriding the
- *                testing resources with a custom Kase\TestValidator instance can be found below.
- *
- *      reporter: This is the object which will handle reporting calls from the test runner.  It must
- *                be an object which implements the Kase\SuiteReporter interface.  An ad-hoc example
- *                of overriding the testing resources with a custom reporter instance can be found below.
- *
- * Aside from any desired customization of testing resources, the only requirement of the bootstrap
- * function is to find and include test suite files, executing each returned test suite callback by
- * passing in the testing resources package as an argument.  How to find and loop over the test suite
- * files is up to the end user; the example below uses the Nette\Finder library. To use the Nette\Finder
- * library, see the following link for installation instructions and documentation:
- *     https://github.com/nette/finder
- */
-
-return function ($testingResources) {
-    // --------- override validator resource to use custom Kase\TestValidator instance ----------
-    $customValidationMethods = [
-        'assertEvenInteger' =>
-            function ($value, $message = 'Failed to assert that the given value was an even integer') {
-                if (is_int($value) && ($value % 2) === 0) {
-                    return;
-                }
-
-                throw new ValidationFailureException($message);
-            }
-    ];
-    $testingResources['validator'] = new Kase\TestValidator($customValidationMethods);
-
-    // -------------- override reporter resource to use some custom reporter instance --------------
-    // $testingResources['reporter'] = new AcmeTestReporter();
-
-    // --------------------------- find and run all desired test suites ----------------------------
-    $testSuiteFilePattern = '*.test.php';
-    $testSuiteDir = dirname(__FILE__);
-    foreach (\Nette\Utils\Finder::findFiles($testSuiteFilePattern)->in($testSuiteDir) as $absTestSuiteFilePath => $fileInfo) {
-        // $absTestSuiteFilePath is a string containing the absolute filename with path
-        // $fileInfo is an instance of SplFileInfo
-        $testSuiteRunner = require $absTestSuiteFilePath;
-        $testSuiteRunner($testingResources);
-    }
-};
-```
+### Example Kase Bootstrap File
+*Kase relies on a user-defined bootstrap file to customize testing resources as needed and include test files. A bootstrap file must be specified when running Kase.  An example bootstrap file can be found in the `example` folder with explanations of proper bootstrap configuration.*
 
 ### Example Kase Test Suite
-*Note that a more realistic example can be found in the source in the `examples` folder*
+*Note that a more realistic example can be found in the `examples` folder*
 
 ```php
 <?php
@@ -177,11 +119,11 @@ TestValidator::assertSame($expectedValue, $actualValue, $message = 'Failed to as
 Asserts that the expected value matches the actual value using strict (===) equality, or fails the test case with the given message
 
 ## Custom Assertion Methods
-As shown in [the example bootstrap file](#example_bootstrap) above, you can swap a new `Kase\TestValidator` instance (or any other class instance, for that matter) into the testing resources package to assert against it within test cases.  The `Kase\TestValidator` constructor accepts a dictionary of custom assertion callbacks in the format:
+The user can swap a new `Kase\TestValidator` instance (or any other class instance, for that matter) into the testing resources package to assert against it within test cases (see the example bootstrap file in the `example` folder of the repo for details on how this is accomplished).  The `Kase\TestValidator` constructor accepts a dictionary of custom assertion callbacks in the format:
 
 	<validation method name> => <validation callback>
 
-Note that it is only necessary to create a new `Kase\TestValidator` instance if you wish to use custom assertion methods--a default instance is already created within the Kase context that supports the [basic assertion methods](#basic_assertions) outlined above.
+Note that it is only necessary to create a new `Kase\TestValidator` instance if you wish to use custom assertion methods...if not, a default instance will be created within the Kase runner that supports the [basic assertion methods](#basic_assertions) outlined above.
 
 ## Testing Kase
 	./vendor/bin/phpunit

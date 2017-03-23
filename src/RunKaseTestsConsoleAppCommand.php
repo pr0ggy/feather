@@ -39,34 +39,44 @@ class RunKaseTestsConsoleAppCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // ----------------------- initialize the Kase testing resources ------------------------
+        // INCLUDE KASE BOOTSTRAP
+        $bootstrapPath = $input->getOption('bootstrap');
+        if ($bootstrapPath && file_exists($bootstrapPath)) {
+            require $bootstrapPath;
+        } else {
+            $output->writeln("Error: Could not find specified Kase bootstrap file: {$bootstrapPath}\n\n");
+            return;
+        }
+
+        // VERIFY REQUIRED USER-DEFINED FUNCTIONS ARE DEFINED IN BOOTSTRAP FILE
+        if (function_exists('Kase\testSuitePathProvider') === false) {
+            $output->writeln('Error: Required "Kase\testSuitePathProvider" function not found in bootstrap');
+            return;
+        }
+
+        // SET UP TESTING RESOURCES
         $metricsLog = [];
-        $testingResources = [
+        $defaultTestingResources = [
             'validator'     => new TestValidator(),
             'reporter'      => new DefaultKaseCLIReporter($output),
             'metricsLogger' => function ($metricsToRecord) use (&$metricsLog) {
                 $metricsLog[] = $metricsToRecord;
             }
         ];
+        $userDefinedResourceOverrides = (function_exists('Kase\overrideTestingResources') ? overrideTestingResources() : []);
 
-        // ------------------------------------- print Kase version -------------------------------------
-        $output->writeln(PHP_EOL.'Kase '.VERSION.PHP_EOL);
+        $testingResources = ($userDefinedResourceOverrides + $defaultTestingResources);
 
-        // --------------------------------- run Kase bootstrap ---------------------------------
-        $bootstrapPath = $input->getOption('bootstrap');
-        if ($bootstrapPath && file_exists($bootstrapPath)) {
-            $bootstrapper = require $bootstrapPath;
-            $bootstrapper($testingResources);
-        } else {
-            $output->writeln("Error: Could not find specified Kase bootstrap file: {$bootstrapPath}\n\n");
-            return;
+        // SEND RUNNER INITIALIZATION EVENT TO REPORTER
+        $testingResources['reporter']->registerTestRunnerInitialization();
+        
+        // RUN TESTS
+        foreach (testSuitePathProvider() as $testSuiteFilePath) {
+            $suiteRunner = require $testSuiteFilePath;
+            $suiteRunner($testingResources);
         }
 
-        // ------------------------------------ report results -------------------------------------
-        if (count($metricsLog) === 0) {
-            $output->writeln('No test files found'.PHP_EOL);
-        } else {
-            $testingResources['reporter']->registerSuiteMetricsSummary($metricsLog);
-        }
+        // REPORT RESULTS
+        $testingResources['reporter']->registerSuiteMetricsSummary($metricsLog);
     }
 }

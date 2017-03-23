@@ -33,6 +33,16 @@ class DefaultKaseCLIReporter implements Reporter
     }
 
     /**
+     * Writes Kase version to the console
+     */
+    public function registerTestRunnerInitialization()
+    {
+        $this->writeBlankLineToOutput();
+        $this->writeLineToOutput('Kase '.VERSION);
+        $this->writeBlankLineToOutput();
+    }
+
+    /**
      * Writes suite description to the reporter's OutputInterface instance just before running the
      * tests within a suite
      *
@@ -190,9 +200,10 @@ class DefaultKaseCLIReporter implements Reporter
     public function registerSuiteExecutionCompletion($suiteDescription, array $suiteMetrics)
     {
         $executionDurationInSeconds = ($suiteMetrics['executionEndTime'] - $suiteMetrics['executionStartTime']);
+        $executionDurationText = (($executionDurationInSeconds < 0.001) ? 'less than 1ms' : number_format($executionDurationInSeconds, 3).' seconds');
 
         $this->writeLineToOutput('//');
-        $this->writeLineToOutput("// {$suiteDescription} tested in ".number_format($executionDurationInSeconds, 3).' seconds');
+        $this->writeLineToOutput("// {$suiteDescription} tested in {$executionDurationText}");
         $this->writeLineToOutput(
             "// {$this->inSuccessFormat($suiteMetrics['passedTestCount'])} Passed, {$this->inErrorFormat(count($suiteMetrics['failedTests']))} Failed, {$this->inCommentFormat(count($suiteMetrics['skippedTests']))} Skipped"
         );
@@ -213,10 +224,11 @@ class DefaultKaseCLIReporter implements Reporter
     public function registerSuiteMetricsSummary(array $suiteMetricsList)
     {
         if (empty($suiteMetricsList)) {
+            $this->writeLineToOutput('No test files found');
             return;
         }
 
-        // ----------------------------- GENERATE SUITE METRIC SUMMARY -----------------------------
+        // GENERATE SUITE METRIC SUMMARY
         $suiteSummaryReducer = function ($summary, $individualSuiteMetrics) {
             $summary['passedTestCount'] += $individualSuiteMetrics['passedTestCount'];
             $summary['failedTestCount'] += count($individualSuiteMetrics['failedTests']);
@@ -236,7 +248,9 @@ class DefaultKaseCLIReporter implements Reporter
             ]
         );
 
-        // ------------------------------- PRINT THE TESTING SUMMARY -------------------------------
+        $executionDurationText = (($resultSummary['duration'] < 0.001) ? 'less than 1ms' : number_format($resultSummary['duration'], 3).' seconds');
+
+        // PRINT THE TESTING SUMMARY
         $this->writeLineToOutput('///////////////////////////////////////////');
         $this->writeLineToOutput('//');
         $this->writeLineToOutput('//  TESTING SUMMARY');
@@ -244,7 +258,7 @@ class DefaultKaseCLIReporter implements Reporter
         $this->writeLineToOutput(
             "// {$this->inSuccessFormat($resultSummary['passedTestCount'])} Passed, {$this->inErrorFormat($resultSummary['failedTestCount'])} Failed, {$this->inCommentFormat($resultSummary['skippedTestCount'])} Skipped"
         );
-        $this->writeLineToOutput("// Completed in ".number_format($resultSummary['duration'], 3).' seconds');
+        $this->writeLineToOutput("// Completed in {$executionDurationText}");
         $this->writeBlankLineToOutput();
 
         foreach ($suiteMetricsList as $suiteMetrics) {

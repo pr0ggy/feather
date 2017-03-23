@@ -10,6 +10,11 @@ namespace Kase;
 interface Reporter
 {
     /**
+     * Called by the test runner just after setting up all testing resources and just before running test suites
+     */
+    public function registerTestRunnerInitialization();
+ 
+    /**
      * Called by the test runner just before running the tests within a suite
      *
      * @param  string $suiteDescription

@@ -11,10 +11,12 @@ use RuntimeException;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * The core test suite running method.  Handles execution of a given list of tests comprising a suite.
+ * The core test suite runner generation method.  The returned callback handles execution of a given
+ * list of tests comprising a suite.
  *
  * @param  string $suiteDescription the description of the suite defined by all the given tests
  * @param  array  $tests            a packed array of test instances passed to the function
+ * @return callable  callback which handles execution of a given list of tests comprising a suite.
  */
 function runner($suiteDescription, ...$suiteTests)
 {
@@ -23,7 +25,7 @@ function runner($suiteDescription, ...$suiteTests)
         $testReporter = $testingResources['reporter'];
         $metricsLogger = $testingResources['metricsLogger'];
 
-        // ------------------------------- INITIALIZE SUITE METRICS DATA -------------------------------
+        // INITIALIZE SUITE METRICS DATA
         $suiteMetrics = [
             'suiteDescription' => $suiteDescription,
             'passedTestCount' => 0,
@@ -31,11 +33,11 @@ function runner($suiteDescription, ...$suiteTests)
             'skippedTests' => []    // list of skipped test descriptions
         ];
 
-        // ---------------------------- BEGIN TEST SUITE METRICS RECORDING -----------------------------
+        // BEGIN TEST SUITE METRICS RECORDING
         $suiteMetrics['executionStartTime'] = microtime(true);
         $testReporter->registerSuiteExecutionInitiation($suiteDescription);
 
-        // ------------------------ DETERMINE WHICH TESTS ACTUALLY NEED TO RUN -------------------------
+        // DETERMINE WHICH TESTS ACTUALLY NEED TO RUN
         $isTestIsolated = function ($test) {
             return ($test['runMode'] === TEST_MODE_ISOLATED);
         };
@@ -48,7 +50,7 @@ function runner($suiteDescription, ...$suiteTests)
             $testsToRun = $suiteTests;
         }
 
-        // --------------------------------------- RUN THE TESTS ---------------------------------------
+        // RUN THE TESTS
         foreach ($testsToRun as $test) {
             try {
                 if ($test['runMode'] === TEST_MODE_SKIPPED) {
@@ -70,7 +72,7 @@ function runner($suiteDescription, ...$suiteTests)
             }
         }
 
-        // ----------------------------- END TEST SUITE METRICS RECORDING ------------------------------
+        // END TEST SUITE METRICS RECORDING
         $suiteMetrics['executionEndTime'] = microtime(true);
         $testReporter->registerSuiteExecutionCompletion($suiteDescription, $suiteMetrics);
         $metricsLogger($suiteMetrics);
@@ -86,7 +88,7 @@ function runner($suiteDescription, ...$suiteTests)
  */
 function test($description, callable $testDefinition)
 {
-    return createTest($description, $testDefinition, TEST_MODE_NORMAL);
+    return _createTest($description, $testDefinition, TEST_MODE_NORMAL);
 }
 
 /**
@@ -99,7 +101,7 @@ function test($description, callable $testDefinition)
  */
 function only($description, callable $testDefinition)
 {
-    return createTest($description, $testDefinition, TEST_MODE_ISOLATED);
+    return _createTest($description, $testDefinition, TEST_MODE_ISOLATED);
 }
 
 /**
@@ -111,7 +113,7 @@ function only($description, callable $testDefinition)
  */
 function skip($description, callable $testDefinition)
 {
-    return createTest($description, $testDefinition, TEST_MODE_SKIPPED);
+    return _createTest($description, $testDefinition, TEST_MODE_SKIPPED);
 }
 
 
@@ -128,7 +130,7 @@ function skip($description, callable $testDefinition)
  *                                                                         which the test should run
  * @return Dictionary a dictionary representing a runnable test case
  */
-function createTest($testDescription, callable $testDefinition, $runMode)
+function _createTest($testDescription, callable $testDefinition, $runMode)
 {
     return new Dictionary([
         'description' => $testDescription,
@@ -137,7 +139,13 @@ function createTest($testDescription, callable $testDefinition, $runMode)
     ]);
 }
 
-function getVersion()
+/**
+ * Returns the Kase version defined in the composer.json file (which will be the 'source of truth'
+ * for versioning)
+ *
+ * @return string  the current Kase version
+ */
+function _getVersion()
 {
     return (json_decode(file_get_contents(dirname(__FILE__).'/../composer.json'), true))['version'];
 }
