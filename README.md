@@ -123,7 +123,7 @@ The user can swap a new `Kase\TestValidator` instance (or any other class instan
 
 	<validation method name> => <validation callback>
 
-Note that it is only necessary to create a new `Kase\TestValidator` instance if you wish to use custom assertion methods...if not, a default instance will be created within the Kase runner that supports the [basic assertion methods](#basic_assertions) outlined above.
+The given custom validation callbacks will be scope bound to the validator instance itself before execution, so you may access other validation methods within the custom callback using standard `$this->assert(...)` calls.  Note that it is only necessary to create a new `Kase\TestValidator` instance if you wish to use custom assertion methods...if not, a default instance will be created within the Kase runner that supports the [basic assertion methods](#basic_assertions) outlined above.
 
 ## Testing Kase
 	./vendor/bin/phpunit
