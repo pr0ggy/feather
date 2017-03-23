@@ -18,7 +18,7 @@ function fizzBuzz($i)
 return runner( 'Function tests',
 
     test('FizzBuzz returns "Fizz" if given value is a multiple of 3', function ($t) {
-        $multiplesOf3Only = [3, 5, 9, 12, 18];
+        $multiplesOf3Only = [3, 6, 9, 12, 18];
         foreach ($multiplesOf3Only as $fizzValue) {
             $t->assertEqual('Fizz', FizzBuzz($fizzValue),
                 "FizzBuzz failed to return 'Fizz' when given {$fizzValue} (which is a multiple of 3)");
