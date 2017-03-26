@@ -29,10 +29,10 @@ Kase takes design inspiration from the [Tape](https://github.com/substack/tape) 
 
 namespace Acme;
 
-use Kase\runner;
-use Kase\test;
-use Kase\skip;
-use Kase\only;
+use function Kase\runner;
+use function Kase\test;
+use function Kase\skip;
+use function Kase\only;
 
 return runner( 'Demo Test Suite',
 
