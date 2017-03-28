@@ -138,14 +138,3 @@ function _createTest($testDescription, callable $testDefinition, $runMode)
         'runMode' => $runMode
     ]);
 }
-
-/**
- * Returns the Kase version defined in the composer.json file (which will be the 'source of truth'
- * for versioning)
- *
- * @return string  the current Kase version
- */
-function _getVersion()
-{
-    return (json_decode(file_get_contents(dirname(__FILE__).'/../composer.json'), true))['version'];
-}

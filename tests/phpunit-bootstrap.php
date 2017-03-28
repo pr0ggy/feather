@@ -1,3 +1,3 @@
 <?php
 
-define('Kase\VERSION', Kase\_getVersion());
+require __DIR__.'/../src/const.php';

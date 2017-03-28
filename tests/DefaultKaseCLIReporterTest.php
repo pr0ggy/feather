@@ -229,7 +229,7 @@ class DefaultKaseCLIReporterTest extends TestCase
         $sut = new DefaultKaseCLIReporter($fakeOutput);
         $someValidationFailureMessage = 'something went wrong';
         $someValidationException = new ValidationFailureException($someValidationFailureMessage);
-        
+
         $anotherValidationFailureMessage = 'something went wrong again';
         $someExpectedValue = [true];
         $someActualValue = [false];
@@ -238,7 +238,7 @@ class DefaultKaseCLIReporterTest extends TestCase
             $someExpectedValue,
             $someActualValue
         );
-        
+
         $suiteMetricsList = [
             // some suite A
             [

@@ -25,7 +25,6 @@
             "Kase\\" : "src/"
         },
         "files": [
-            "src/const.php",
             "src/functions.php"
         ]
     },
