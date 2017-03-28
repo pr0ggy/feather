@@ -3,7 +3,7 @@
     xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.5/phpunit.xsd"
     backupGlobals="true"
     backupStaticAttributes="false"
-    bootstrap="./test/phpunit-bootstrap.php"
+    bootstrap="./tests/phpunit-bootstrap.php"
     cacheTokens="false"
     colors="true"
     convertErrorsToExceptions="true"
@@ -26,8 +26,8 @@
 
     <testsuites>
         <testsuite name="Kase Tests">
-            <directory>./test</directory>
-            <exclude>./test/Utils/fixtures</exclude>
+            <directory>./tests</directory>
+            <exclude>./tests/Utils/fixtures</exclude>
         </testsuite>
     </testsuites>
 
