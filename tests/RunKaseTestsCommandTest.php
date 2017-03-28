@@ -8,7 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use function Nark\createSpyInstanceOf;
 
-class RunKaseTestsConsoleAppCommandTest extends TestCase
+class RunKaseTestsCommandTest extends TestCase
 {
     /**
      * @test
@@ -27,7 +27,7 @@ class RunKaseTestsConsoleAppCommandTest extends TestCase
     private function createCommandAndTester()
     {
         $application = new Application();
-        $application->add(new RunKaseTestsConsoleAppCommand());
+        $application->add(new RunKaseTestsCommand());
 
         $command = $application->find('run');
         return [$command, new CommandTester($command)];

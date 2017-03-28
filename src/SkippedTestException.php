@@ -7,7 +7,7 @@ namespace Kase;
  *
  * @package Kase
  */
-class SkippedTestException extends \Exception
+class SkippedTestException extends \RuntimeException
 {
 
 }

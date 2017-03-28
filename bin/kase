@@ -38,8 +38,9 @@ require COMPOSER_AUTOLOADER;
 
 // CREATE KASE APP AND LAUNCHER COMMAND
 $KaseApp = new Application('Kase', VERSION);
-$KaseRunTestsCommand = new RunKaseTestsConsoleAppCommand();
+$KaseRunTestsCommand = new RunKaseTestsCommand();
 $KaseApp->add($KaseRunTestsCommand);
+$KaseApp->add(new CreateKaseTestSuiteFileCommand());
 $KaseApp->setDefaultCommand($KaseRunTestsCommand->getName(), true);
 
 // CLEANUP GLOBALS

@@ -14,7 +14,7 @@ use RuntimeException;
  *
  * @package Kase
  */
-class RunKaseTestsConsoleAppCommand extends Command
+class RunKaseTestsCommand extends Command
 {
     /**
      * Defines the command name and available options
@@ -69,7 +69,7 @@ class RunKaseTestsConsoleAppCommand extends Command
 
         // SEND RUNNER INITIALIZATION EVENT TO REPORTER
         $testingResources['reporter']->registerTestRunnerInitialization();
-        
+
         // RUN TESTS
         foreach (testSuitePathProvider() as $testSuiteFilePath) {
             $suiteRunner = require $testSuiteFilePath;
