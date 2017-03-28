@@ -1,11 +1,20 @@
 <?php
 
-namespace Kase;
+namespace Kase\Test;
 
 use PHPUnit\Framework\TestCase;
 use Equip\Structure\Dictionary;
 use function Nark\createSpyInstanceOf;
 use function Nark\occurredChronologically;
+use Kase\ValidationFailureException;
+use const Kase\TEST_MODE_NORMAL;
+use const Kase\TEST_MODE_SKIPPED;
+use const Kase\TEST_MODE_ISOLATED;
+use function Kase\test;
+use function Kase\skip;
+use function Kase\only;
+use function Kase\runner;
+use function Kase\_createTest;
 
 class FunctionsTest extends TestCase
 {

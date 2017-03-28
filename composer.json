@@ -30,7 +30,7 @@
     },
     "autoload-dev": {
         "psr-4" : {
-            "Kase\\Test\\Utils\\" : "tests/Utils/"
+            "Kase\\Test\\" : "tests/"
         },
         "files": []
     }

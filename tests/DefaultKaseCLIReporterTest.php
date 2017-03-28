@@ -1,8 +1,10 @@
 <?php
 
-namespace Kase;
+namespace Kase\Test;
 
 use PHPUnit\Framework\TestCase;
+use Kase\DefaultKaseCLIReporter;
+use Kase\ValidationFailureException;
 use function Nark\occurredSequentially;
 
 class DefaultKaseCLIReporterTest extends TestCase

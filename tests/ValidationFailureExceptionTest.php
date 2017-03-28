@@ -1,8 +1,9 @@
 <?php
 
-namespace Kase;
+namespace Kase\Test;
 
 use PHPUnit\Framework\TestCase;
+use Kase\ValidationFailureException;
 
 class ValidationFailureExceptionTest extends TestCase
 {

@@ -1,12 +1,13 @@
 <?php
 
-namespace Kase;
+namespace Kase\Test;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use function Nark\createSpyInstanceOf;
+use Kase\RunKaseTestsCommand;
 
 class RunKaseTestsCommandTest extends TestCase
 {
