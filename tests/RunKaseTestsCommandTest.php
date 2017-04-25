@@ -58,6 +58,40 @@ class RunKaseTestsCommandTest extends TestCase
     /**
      * @test
      */
+    public function execute_displaysErrorMessage_whenNoTestSuitePathProviderDefinedInConfig()
+    {
+        list($command, $commandTester) = $this->createCommandAndTester();
+
+        $commandTester->execute([
+            'command'  => $command->getName(),
+            '--config' => 'tests/fixtures/empty-config.php'
+        ]);
+
+        $output = $commandTester->getDisplay();
+        $this->assertContains('Error: Required "testSuitePathProvider" callable not found in config', $output,
+            'no error message sent to output as expected');
+    }
+
+    /**
+     * @test
+     */
+    public function execute_displaysErrorMessage_whenTestSuitePathProviderDefinedInConfigNotCallable()
+    {
+        list($command, $commandTester) = $this->createCommandAndTester();
+
+        $commandTester->execute([
+            'command'  => $command->getName(),
+            '--config' => 'tests/fixtures/config-with-uncallable-test-suite-provider.php'
+        ]);
+
+        $output = $commandTester->getDisplay();
+        $this->assertContains('Error: Required "testSuitePathProvider" callable not found in config', $output,
+            'no error message sent to output as expected');
+    }
+
+    /**
+     * @test
+     */
     public function execute_UsesReporterInstanceDefinedInConfig()
     {
         list($command, $commandTester) = $this->createCommandAndTester();
