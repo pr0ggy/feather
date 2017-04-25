@@ -25,11 +25,11 @@ class RunKaseTestsCommand extends Command
             ->setName('run')
             ->setDescription('Kase testing framework CLI runner')
             ->addOption(
-                'bootstrap',
-                'b',
+                'config',
+                'c',
                 InputOption::VALUE_REQUIRED,
-                'The bootstrap file to be included before Kase runs',
-                getcwd().DIRECTORY_SEPARATOR.'kase-bootstrap.php' // default value
+                'The config file used to set up Kase before running tests',
+                __DIR__.DIRECTORY_SEPARATOR.'kase-config.php' // default value
             );
     }
 
@@ -40,38 +40,37 @@ class RunKaseTestsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // INCLUDE KASE BOOTSTRAP
-        $bootstrapPath = $input->getOption('bootstrap');
-        if ($bootstrapPath && file_exists($bootstrapPath)) {
-            require $bootstrapPath;
+        $configPath = $input->getOption('config');
+        if ($configPath && file_exists($configPath)) {
+            $config = require $configPath;
         } else {
-            $output->writeln("Error: Could not find specified Kase bootstrap file: {$bootstrapPath}\n\n");
+            $output->writeln("Error: Could not find specified Kase config file: {$configPath}\n\n");
             return;
         }
 
-        // VERIFY REQUIRED USER-DEFINED FUNCTIONS ARE DEFINED IN BOOTSTRAP FILE
-        if (function_exists('Kase\testSuitePathProvider') === false) {
-            $output->writeln('Error: Required "Kase\testSuitePathProvider" function not found in bootstrap');
+        // VERIFY REQUIRED RESOURCES ARE DEFINED IN CONFIG FILE
+        if (array_key_exists('testSuitePathProvider', $config) === false || is_callable($config['testSuitePathProvider']) === false) {
+            $output->writeln('Error: Required "testSuitePathProvider" callable not found in config');
             return;
         }
 
         // SET UP TESTING RESOURCES
         $metricsLog = [];
-        $defaultTestingResources = [
-            'validator'     => new TestValidator(),
-            'reporter'      => new DefaultKaseCLIReporter($output),
+        $testingResources = [
+            'validator'     => (isset($config['validator']) ? $config['validator'] : new TestValidator()),
+            'reporter'      => (isset($config['reporter']) ? $config['reporter'] : new DefaultKaseCLIReporter($output)),
             'metricsLogger' => function ($metricsToRecord) use (&$metricsLog) {
                 $metricsLog[] = $metricsToRecord;
-            }
+            },
+            'console'      => $output // normally shouldn't be used in testing, mostly for unit testing of Kase
         ];
-        $userDefinedResourceOverrides = (function_exists('Kase\overrideTestingResources') ? overrideTestingResources() : []);
-
-        $testingResources = ($userDefinedResourceOverrides + $defaultTestingResources);
 
         // SEND RUNNER INITIALIZATION EVENT TO REPORTER
         $testingResources['reporter']->registerTestRunnerInitialization();
 
         // RUN TESTS
-        foreach (testSuitePathProvider() as $testSuiteFilePath) {
+        $suiteFileProvider = $config['testSuitePathProvider'];
+        foreach ($suiteFileProvider() as $testSuiteFilePath) {
             $suiteRunner = require $testSuiteFilePath;
             $suiteRunner($testingResources);
         }
