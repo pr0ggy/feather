@@ -16,6 +16,14 @@ use RuntimeException;
  */
 class RunKaseTestsCommand extends Command
 {
+    private $config;
+
+    public function __construct(array $config = null)
+    {
+        $this->config = $config;
+        parent::__construct();
+    }
+
     /**
      * Defines the command name and available options
      */
@@ -40,16 +48,19 @@ class RunKaseTestsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // INCLUDE KASE BOOTSTRAP
-        $configPath = $input->getOption('config');
-        if ($configPath && file_exists($configPath)) {
-            $config = require $configPath;
-        } else {
-            $output->writeln("Error: Could not find specified Kase config file: {$configPath}\n\n");
-            return;
+        if (isset($this->config) === false) {
+            $configPath = $input->getOption('config');
+            if ($configPath && file_exists($configPath)) {
+                $this->config = require $configPath;
+            } else {
+                $output->writeln("Error: Could not find specified Kase config file: {$configPath}\n\n");
+                return;
+            }
         }
 
+
         // VERIFY REQUIRED RESOURCES ARE DEFINED IN CONFIG FILE
-        if (array_key_exists('testSuitePathProvider', $config) === false || is_callable($config['testSuitePathProvider']) === false) {
+        if (array_key_exists('testSuitePathProvider', $this->config) === false || is_callable($this->config['testSuitePathProvider']) === false) {
             $output->writeln('Error: Required "testSuitePathProvider" callable not found in config');
             return;
         }
@@ -57,8 +68,8 @@ class RunKaseTestsCommand extends Command
         // SET UP TESTING RESOURCES
         $metricsLog = [];
         $testingResources = [
-            'validator'     => (isset($config['validator']) ? $config['validator'] : new TestValidator()),
-            'reporter'      => (isset($config['reporter']) ? $config['reporter'] : new DefaultKaseCLIReporter($output)),
+            'validator'     => (isset($this->config['validator']) ? $this->config['validator'] : new TestValidator()),
+            'reporter'      => (isset($this->config['reporter']) ? $this->config['reporter'] : new DefaultKaseCLIReporter($output)),
             'metricsLogger' => function ($metricsToRecord) use (&$metricsLog) {
                 $metricsLog[] = $metricsToRecord;
             },
@@ -69,7 +80,7 @@ class RunKaseTestsCommand extends Command
         $testingResources['reporter']->registerTestRunnerInitialization();
 
         // RUN TESTS
-        $suiteFileProvider = $config['testSuitePathProvider'];
+        $suiteFileProvider = $this->config['testSuitePathProvider'];
         foreach ($suiteFileProvider() as $testSuiteFilePath) {
             $suiteRunner = require $testSuiteFilePath;
             $suiteRunner($testingResources);
