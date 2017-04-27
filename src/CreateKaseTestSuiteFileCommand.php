@@ -27,14 +27,14 @@ class CreateKaseTestSuiteFileCommand extends Command
             ->setHelp('This command allows you to create a new boilerplate test suite file at the given path')
             ->addOption(
                 'test-dir',
-                null,
+                'd',
                 InputOption::VALUE_REQUIRED,
                 'The directory where tests are located',
                 PROJECT_ROOT_DIR.'/tests'
             )
             ->addOption(
                 'namespace',
-                null,
+                'n',
                 InputOption::VALUE_REQUIRED,
                 'The namespace in which to define the test file'
             )

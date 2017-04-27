@@ -15,6 +15,11 @@ Kase takes design inspiration from the [Tape](https://github.com/substack/tape) 
 ### Installation
 	composer require --dev pr0ggy/kase
 
+### Creating a New Kase Test Suite Boilerplate File
+    ./vendor/bin/kase create-suite [-d|--test-dir <test directory, default: ./tests>]
+                                   [-n|--namespace <test file namespace>]
+                                   <test file name, relative to test directory>
+
 ### Running Kase
 	./vendor/bin/kase run [-c|--config <config file>]
                           [-d|--test-dir <test directory, default: ./tests>]
