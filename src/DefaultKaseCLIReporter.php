@@ -225,6 +225,7 @@ class DefaultKaseCLIReporter implements Reporter
     {
         if (empty($suiteMetricsList)) {
             $this->writeLineToOutput('No test files found');
+            $this->writeBlankLineToOutput();
             return;
         }
 

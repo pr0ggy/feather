@@ -8,25 +8,6 @@
 return [
 
     /*
-     * REQUIRED KEY: testSuitePathProvider
-     * TYPE: callable
-     *
-     * Must return an iterable containing all the Kase test suite files the user wishes to run.
-     * In this example, the function is a generator which yields a test suite file path on each iteration.
-     * The nette/finder package is used in this example, see: https://github.com/nette/finder
-     */
-    'testSuitePathProvider' => function () {
-        $testSuiteFilePattern = '*.test.php';
-        $testSuiteDir = dirname(__FILE__);
-
-        foreach (\Nette\Utils\Finder::findFiles($testSuiteFilePattern)->from($testSuiteDir) as $absTestSuiteFilePath => $fileInfo) {
-            // $absTestSuiteFilePath is a string containing the absolute filename with path
-            // $fileInfo is an instance of SplFileInfo
-            yield $absTestSuiteFilePath;
-        }
-    },
-
-    /*
      * OPTIONAL KEY: validator
      * TYPE: any
      *

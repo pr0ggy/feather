@@ -16,10 +16,12 @@ Kase takes design inspiration from the [Tape](https://github.com/substack/tape) 
 	composer require --dev pr0ggy/kase
 
 ### Running Kase
-	./vendor/bin/kase run -b [bootstrap file, default: ./kase-bootstrap.php]
+	./vendor/bin/kase run [-c|--config <config file>]
+                          [-d|--test-dir <test directory, default: ./tests>]
+                          [-f|--file-pattern <test file pattern, default: '*.test.php'>]
 
-### Example Kase Bootstrap File
-*Kase relies on a user-defined bootstrap file to customize testing resources as needed and include test files. A bootstrap file must be specified when running Kase.  An example bootstrap file can be found in the `example` folder with explanations of proper bootstrap configuration.*
+### Example Config File
+*Kase can utilize a user-defined config file to customize testing resources if desired.  An example config file can be found in the `example` folder with explanations of options.*
 
 ### Example Kase Test Suite
 *Note that a more realistic example can be found in the `examples` folder*
@@ -59,7 +61,7 @@ return runner( 'Demo Test Suite',
 ```php
 function Kase\runner($suiteDescription, ...$suiteTests)
 ```
-The main test runner generation function which takes a test suite name and 1 or more test cases to execute.  The test suite for the given tests is returned as a callable for execution within the Kase bootstrap file, as in the example above.
+The main test runner generation function which takes a test suite name and 1 or more test cases to execute.  The test suite for the given tests is returned as a callable for execution, as in the example above.
 
 ---
 
@@ -119,7 +121,7 @@ TestValidator::assertSame($expectedValue, $actualValue, $message = 'Failed to as
 Asserts that the expected value matches the actual value using strict (===) equality, or fails the test case with the given message
 
 ## Custom Assertion Methods
-The user can swap a new `Kase\TestValidator` instance (or any other class instance, for that matter) into the testing resources package to assert against it within test cases (see the example bootstrap file in the `example` folder of the repo for details on how this is accomplished).  The `Kase\TestValidator` constructor accepts a dictionary of custom assertion callbacks in the format:
+The user can swap a new `Kase\TestValidator` instance (or any other class instance, for that matter) into the testing resources package to assert against it within test cases (see the example config file in the `example` folder of the repo for details on how this is accomplished).  The `Kase\TestValidator` constructor accepts a dictionary of custom assertion callbacks in the format:
 
 	<validation method name> => <validation callback>
 

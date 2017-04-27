@@ -15,57 +15,18 @@ class RunKaseTestsCommandTest extends TestCase
     /**
      * @test
      */
-    public function execute_usesTestingResourcesPassedDirectlyToCommand()
-    {
-        $kaseConfig = [
-            'testSuitePathProvider' => [$this, 'fixtureTestPathProvider']
-        ];
-
-        $application = new Application();
-        $application->add(new RunKaseTestsCommand($kaseConfig));
-
-        $command = $application->find('run');
-        $commandTester = new CommandTester($command);
-
-        $commandTester->execute([
-            'command'  => $command->getName()
-        ]);
-
-        // if the fixture test files were included, this is proof the command used the config given
-        // during construction as expected
-        $output = $commandTester->getDisplay();
-        $this->assertContains('TEST FILE 1 INCLUDED', $output,
-            'files not provided from suite path provider as expected');
-        $this->assertContains('TEST FILE 2 INCLUDED', $output,
-            'files not provided from suite path provider as expected');
-    }
-
-    public function fixtureTestPathProvider()
-    {
-        $testSuiteDir = dirname(__FILE__).'/fixtures/testing-setup';
-        yield "{$testSuiteDir}/tests/test-1.test.php";
-        yield "{$testSuiteDir}/tests/test-2.test.php";
-    }
-
-    /**
-     * @test
-     */
-    public function execute_readsConfigFilePathFromCommandArg_whenConfigNotExplicitlyPassedToCommand()
+    public function execute_usesGivenTestDirOptionToSearchForTestFiles()
     {
         list($command, $commandTester) = $this->createCommandAndTester();
-
         $commandTester->execute([
             'command'  => $command->getName(),
-            '--config' => 'tests/fixtures/testing-setup/kase-config.php'
+            '--test-dir' => __DIR__.'/fixtures/tests/Bar'
         ]);
 
-        // if the fixture test files were included, this is proof the command read in the fixture
-        // config and used it as expected
         $output = $commandTester->getDisplay();
-        $this->assertContains('TEST FILE 1 INCLUDED', $output,
-            'files not provided from suite path provider as expected');
-        $this->assertContains('TEST FILE 2 INCLUDED', $output,
-            'files not provided from suite path provider as expected');
+        $this->assertContains('BAR TEST FILE 1 INCLUDED', $output);
+        $this->assertNotContains('FOO TEST FILE 1 INCLUDED', $output);
+        $this->assertNotContains('FOO TEST FILE 2 INCLUDED', $output);
     }
 
     private function createCommandAndTester($kaseConfig = null)
@@ -80,7 +41,41 @@ class RunKaseTestsCommandTest extends TestCase
     /**
      * @test
      */
-    public function execute_printsErrorMessageToOutput_whenNoBootstrapFoundAndNoConfigGiven()
+    public function execute_showsError_whenSpecifiedTestDirNotFound()
+    {
+        $nonexistentDir = __DIR__.'/fixtures/tests/NonexistentDir';
+        list($command, $commandTester) = $this->createCommandAndTester();
+        $commandTester->execute([
+            'command'  => $command->getName(),
+            '--test-dir' => $nonexistentDir
+        ]);
+
+        $output = $commandTester->getDisplay();
+        $this->assertContains("Error: Could not find specified specified test directory: {$nonexistentDir}", $output);
+    }
+
+    /**
+     * @test
+     */
+    public function execute_usesGivenFilePatternOptionToSearchForTestFiles()
+    {
+        list($command, $commandTester) = $this->createCommandAndTester();
+        $commandTester->execute([
+            'command'  => $command->getName(),
+            '--file-pattern' => '*-1.test.php',
+            '--test-dir' => __DIR__.'/fixtures/tests'
+        ]);
+
+        $output = $commandTester->getDisplay();
+        $this->assertContains('BAR TEST FILE 1 INCLUDED', $output);
+        $this->assertContains('FOO TEST FILE 1 INCLUDED', $output);
+        $this->assertNotContains('FOO TEST FILE 2 INCLUDED', $output);
+    }
+
+    /**
+     * @test
+     */
+    public function execute_printsErrorMessageToOutput_whenConfigPathGivenButNotFound()
     {
         list($command, $commandTester) = $this->createCommandAndTester();
         $commandTester->execute([
@@ -95,42 +90,6 @@ class RunKaseTestsCommandTest extends TestCase
     /**
      * @test
      */
-    public function execute_displaysErrorMessage_whenNoTestSuitePathProviderDefinedInConfig()
-    {
-        $emptyKaseConfig = [];
-        list($command, $commandTester) = $this->createCommandAndTester($emptyKaseConfig);
-
-        $commandTester->execute([
-            'command'  => $command->getName()
-        ]);
-
-        $output = $commandTester->getDisplay();
-        $this->assertContains('Error: Required "testSuitePathProvider" callable not found in config', $output,
-            'no error message sent to output as expected');
-    }
-
-    /**
-     * @test
-     */
-    public function execute_displaysErrorMessage_whenTestSuitePathProviderDefinedInConfigNotCallable()
-    {
-        $kaseConfigWithBadPathProvider = [
-            'testSuitePathProvider' => false
-        ];
-        list($command, $commandTester) = $this->createCommandAndTester($kaseConfigWithBadPathProvider);
-
-        $commandTester->execute([
-            'command'  => $command->getName()
-        ]);
-
-        $output = $commandTester->getDisplay();
-        $this->assertContains('Error: Required "testSuitePathProvider" callable not found in config', $output,
-            'no error message sent to output as expected');
-    }
-
-    /**
-     * @test
-     */
     public function execute_usesValidatorInstanceDefinedInConfig()
     {
         $kaseConfig = [
@@ -140,11 +99,13 @@ class RunKaseTestsCommandTest extends TestCase
         list($command, $commandTester) = $this->createCommandAndTester($kaseConfig);
 
         $commandTester->execute([
-            'command'  => $command->getName()
+            'command'  => $command->getName(),
+            '--test-dir' => __DIR__.'/fixtures/tests'
         ]);
 
         $validatorInstance = $kaseConfig['validator'];
-        $this->assertEquals(2, $validatorInstance->callCountForMethod('pass'),
+        $numberOfFixtureTestsFiles = 3; // Number of fake test files located in tests/fixtures/tests
+        $this->assertEquals($numberOfFixtureTestsFiles, $validatorInstance->callCountForMethod('pass'),
             'validator defined in config not used by runner as expected');
     }
 
@@ -160,7 +121,8 @@ class RunKaseTestsCommandTest extends TestCase
         list($command, $commandTester) = $this->createCommandAndTester($kaseConfig);
 
         $commandTester->execute([
-            'command'  => $command->getName()
+            'command'  => $command->getName(),
+            '--test-dir' => __DIR__.'/fixtures/tests'
         ]);
 
         $reporterInstance = $kaseConfig['reporter'];

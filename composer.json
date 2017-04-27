@@ -11,14 +11,14 @@
         "symfony/console": "2.*",
         "pr0ggy/mockleton": "^0.3.0",
         "equip/structure": "^1.1",
-        "sebastian/comparator": "^1.2"
+        "sebastian/comparator": "^1.2",
+        "nette/finder": "^2.4"
     },
     "require-dev": {
         "pr0ggy/nark": "^0.2.0",
         "phpunit/phpunit": "^5.7",
         "hamcrest/hamcrest-php": "^2.0",
-        "phpdocumentor/phpdocumentor": "2.*",
-        "nette/finder": "^2.4"
+        "phpdocumentor/phpdocumentor": "2.*"
     },
     "autoload": {
         "psr-4" : {

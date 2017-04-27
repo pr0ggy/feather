@@ -1,6 +1,6 @@
 <?php
 
 return function ($testingResources) {
-    ($testingResources['console'])->writeln('TEST FILE 1 INCLUDED');
+    ($testingResources['console'])->writeln('FOO TEST FILE 2 INCLUDED');
     ($testingResources['validator'])->pass();
 };

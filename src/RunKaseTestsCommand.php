@@ -36,8 +36,21 @@ class RunKaseTestsCommand extends Command
                 'config',
                 'c',
                 InputOption::VALUE_REQUIRED,
-                'The config file used to set up Kase before running tests',
-                __DIR__.DIRECTORY_SEPARATOR.'kase-config.php' // default value
+                'The config file used to set up Kase before running tests'
+            )
+            ->addOption(
+                'test-dir',
+                'd',
+                InputOption::VALUE_REQUIRED,
+                'The directory where test suite files are located',
+                __DIR__.DIRECTORY_SEPARATOR.'tests' // default value
+            )
+            ->addOption(
+                'file-pattern',
+                'f',
+                InputOption::VALUE_REQUIRED,
+                'The glob pattern matching test suite files',
+                '*.test.php' // default value
             );
     }
 
@@ -47,22 +60,17 @@ class RunKaseTestsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // INCLUDE KASE BOOTSTRAP
+        // READ CONFIG FROM FILE IF REQUIRED AND SPECIFIED
         if (isset($this->config) === false) {
             $configPath = $input->getOption('config');
-            if ($configPath && file_exists($configPath)) {
-                $this->config = require $configPath;
-            } else {
-                $output->writeln("Error: Could not find specified Kase config file: {$configPath}\n\n");
-                return;
+            if ($configPath) {
+                if (file_exists($configPath)) {
+                    $this->config = require $configPath;
+                } else {
+                    $output->writeln("Error: Could not find specified Kase config file: {$configPath}\n\n");
+                    return;
+                }
             }
-        }
-
-
-        // VERIFY REQUIRED RESOURCES ARE DEFINED IN CONFIG FILE
-        if (array_key_exists('testSuitePathProvider', $this->config) === false || is_callable($this->config['testSuitePathProvider']) === false) {
-            $output->writeln('Error: Required "testSuitePathProvider" callable not found in config');
-            return;
         }
 
         // SET UP TESTING RESOURCES
@@ -80,9 +88,16 @@ class RunKaseTestsCommand extends Command
         $testingResources['reporter']->registerTestRunnerInitialization();
 
         // RUN TESTS
-        $suiteFileProvider = $this->config['testSuitePathProvider'];
-        foreach ($suiteFileProvider() as $testSuiteFilePath) {
-            $suiteRunner = require $testSuiteFilePath;
+        $testSuiteFilePattern = $input->getOption('file-pattern');
+        $testSuiteDir = $input->getOption('test-dir');
+        if (file_exists($testSuiteDir) === false) {
+            $output->writeln("Error: Could not find specified specified test directory: {$testSuiteDir}\n\n");
+            return;
+        }
+        foreach (\Nette\Utils\Finder::findFiles($testSuiteFilePattern)->from($testSuiteDir) as $absTestSuiteFilePath => $fileInfo) {
+            // $absTestSuiteFilePath is a string containing the absolute filename with path
+            // $fileInfo is an instance of SplFileInfo
+            $suiteRunner = require $absTestSuiteFilePath;
             $suiteRunner($testingResources);
         }
 
