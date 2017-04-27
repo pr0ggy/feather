@@ -17,7 +17,7 @@ Kase takes design inspiration from the [Tape](https://github.com/substack/tape) 
 
 ### Creating a New Kase Test Suite Boilerplate File
     ./vendor/bin/kase create-suite [-d|--test-dir <test directory, default: ./tests>]
-                                   [-n|--namespace <test file namespace>]
+                                   [--namespace <test file namespace>]
                                    <test file name, relative to test directory>
 
 ### Running Kase

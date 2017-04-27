@@ -217,7 +217,7 @@ class DefaultKaseCLIReporterTest extends TestCase
         $outputSpy = $fakeOutput->reflector();
         $this->assertCount(
             1,
-            $outputSpy->writeln('No test files found'),
+            $outputSpy->writeln('No test suites executed'),
             'reporter did not send tests not found warning to output as expected'
         );
     }
