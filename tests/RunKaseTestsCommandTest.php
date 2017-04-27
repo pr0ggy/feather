@@ -41,7 +41,7 @@ class RunKaseTestsCommandTest extends TestCase
     /**
      * @test
      */
-    public function execute_showsError_whenSpecifiedTestDirNotFound()
+    public function execute_printsErrorMessageToOutput_whenSpecifiedTestDirNotFound()
     {
         $nonexistentDir = __DIR__.'/fixtures/tests/NonexistentDir';
         list($command, $commandTester) = $this->createCommandAndTester();
