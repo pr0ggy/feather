@@ -43,7 +43,7 @@ class RunKaseTestsCommand extends Command
                 'd',
                 InputOption::VALUE_REQUIRED,
                 'The directory where test suite files are located',
-                __DIR__.DIRECTORY_SEPARATOR.'tests' // default value
+                getcwd().'/tests' // default value
             )
             ->addOption(
                 'file-pattern',

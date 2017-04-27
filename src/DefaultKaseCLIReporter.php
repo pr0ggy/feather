@@ -224,7 +224,7 @@ class DefaultKaseCLIReporter implements Reporter
     public function registerSuiteMetricsSummary(array $suiteMetricsList)
     {
         if (empty($suiteMetricsList)) {
-            $this->writeLineToOutput('No test files found');
+            $this->writeLineToOutput('No test suites executed');
             $this->writeBlankLineToOutput();
             return;
         }
