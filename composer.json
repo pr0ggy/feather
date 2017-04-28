@@ -1,7 +1,7 @@
 {
     "name": "pr0ggy/kase",
     "description": "A lightweight unit testing framework for PHP",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "type": "library",
     "bin": ["./bin/kase"],
     "keywords": ["php", "unit", "testing", "framework"],

@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Kase\DefaultKaseCLIReporter;
 use Kase\ValidationFailureException;
 use function Nark\occurredSequentially;
+use const Kase\VERSION;
 
 class DefaultKaseCLIReporterTest extends TestCase
 {

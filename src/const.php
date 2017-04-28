@@ -27,10 +27,10 @@ foreach ($potentialAutoloaderPaths as $potentialAutoloaderPath) {
     }
 }
 
-define('COMPOSER_AUTOLOADER', $autoloaderPath);
+define('Kase\COMPOSER_AUTOLOADER', $autoloaderPath);
 
 // OTHER CONSTS
-define('PROJECT_ROOT_DIR', (COMPOSER_AUTOLOADER === NOT_FOUND ? NOT_FOUND : dirname(dirname(COMPOSER_AUTOLOADER))));
-define('VERSION', (json_decode(file_get_contents("{$SRC_DIR}/../composer.json"), true))['version']);
+define('Kase\PROJECT_ROOT_DIR', (COMPOSER_AUTOLOADER === NOT_FOUND ? NOT_FOUND : dirname(dirname(COMPOSER_AUTOLOADER))));
+define('Kase\VERSION', (json_decode(file_get_contents("{$SRC_DIR}/../composer.json"), true))['version']);
 
 
