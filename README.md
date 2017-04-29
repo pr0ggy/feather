@@ -16,13 +16,13 @@ Kase takes design inspiration from the [Tape](https://github.com/substack/tape) 
 	composer require --dev pr0ggy/kase
 
 ### Creating a New Kase Test Suite Boilerplate File
-    ./vendor/bin/kase create-suite [-d|--test-dir <test directory, default: ./tests>]
-                                   [--namespace <test file namespace>]
+    ./vendor/bin/kase create-suite [-d|--test-dir <test directory, default: /PROJECT/ROOT/tests>]
+                                   [--namespace <test file namespace>
                                    <test file name, relative to test directory>
 
 ### Running Kase
 	./vendor/bin/kase run [-c|--config <config file>]
-                          [-d|--test-dir <test directory, default: ./tests>]
+                          [-d|--test-dir <test directory, default: ./>]
                           [-f|--file-pattern <test file pattern, default: '*.test.php'>]
 
 ### Example Config File
