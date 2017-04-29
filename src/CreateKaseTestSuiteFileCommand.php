@@ -7,6 +7,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Exceptions\IO\Filesystem;
 
 /**
  * Symfony component console command which will create a new Kase test suite file at a path relative
@@ -30,7 +31,7 @@ class CreateKaseTestSuiteFileCommand extends Command
                 '-d',
                 InputOption::VALUE_REQUIRED,
                 'The directory where tests are located',
-                PROJECT_ROOT_DIR.'/tests'
+                CLIENT_PROJECT_ROOT.'/tests'
             )
             ->addOption(
                 'namespace',
@@ -53,13 +54,13 @@ class CreateKaseTestSuiteFileCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $testDirectory = $input->getOption('test-dir');
-        if (file_exists($testDirectory) === false) {
-            throw new NotFoundException("Test directory not found: {$testDirectory}");
+        if (is_dir($testDirectory) === false) {
+            throw new Filesystem\DirectoryNotFoundException("Test directory not found: {$testDirectory}");
         }
 
         $fileToCreate = $testDirectory.'/'.$input->getArgument('file-path').'.php';
         if (file_exists($fileToCreate)) {
-            throw new CollisionException('File already exists: '.realpath($fileToCreate));
+            throw new Filesystem\FileAlreadyExistsException('File already exists: '.realpath($fileToCreate));
         }
 
         $testNamespace = $input->getOption('namespace');

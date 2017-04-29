@@ -6,8 +6,6 @@ namespace Kase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
-require __DIR__.'/../src/const.php';
-
 // VERIFY PHP VERSION
 if (version_compare('5.6.0', PHP_VERSION, '>') && $argv[1] !== '--version') {
     fwrite(
@@ -23,18 +21,8 @@ if (version_compare('5.6.0', PHP_VERSION, '>') && $argv[1] !== '--version') {
     die(1);
 }
 
-// REQUIRE COMPOSER AUTOLOADER
-if (COMPOSER_AUTOLOADER === NOT_FOUND) {
-    fwrite(
-        STDERR,
-        'No vendor directory found'.PHP_EOL.
-        'are you sure you installed dependencies via `composer install`?'.PHP_EOL
-    );
-
-    die(1);
-}
-
-require COMPOSER_AUTOLOADER;
+// REQUIRE AUTOLOADER
+require __DIR__.'/../src/autoload.php';
 
 // CREATE KASE APP AND LAUNCHER COMMAND
 $KaseApp = new Application('Kase', VERSION);

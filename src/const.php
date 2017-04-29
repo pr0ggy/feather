@@ -10,27 +10,17 @@ const TEST_MODE_SKIPPED = 3;    // test will be skipped
 // ERROR/LOGIC HANDLING CONSTANTS
 const NOT_FOUND = 0;
 
-// DETERMINE PATH TO COMPOSER AUTOLOADER
-$SRC_DIR = __DIR__;
-$potentialAutoloaderPaths = [
-    "{$SRC_DIR}/../../../autoload.php", // should be the correct path when running Kase as a
-                                        // dep within another project
-
-    "{$SRC_DIR}/../vendor/autoload.php" // should be correct path when doing local dev on Kase
+// CALCULATE AND CREATE PROJECT ROOT PATH CONSTANT
+$potentialComposerJSONPaths = [
+    __DIR__.'/../../../..',  // if composer dependency
+    __DIR__.'/..'            // if stand-alone package
 ];
-$autoloaderPath = NOT_FOUND;
-
-foreach ($potentialAutoloaderPaths as $potentialAutoloaderPath) {
-    if (file_exists($potentialAutoloaderPath)) {
-        $autoloaderPath = realpath($potentialAutoloaderPath);
+foreach ($potentialComposerJSONPaths as $composerJSONPath) {
+    if (is_file("{$composerJSONPath}/composer.json")) {
+        define('Kase\CLIENT_PROJECT_ROOT', realpath($composerJSONPath));
         break;
     }
 }
 
-define('Kase\COMPOSER_AUTOLOADER', $autoloaderPath);
-
 // OTHER CONSTS
-define('Kase\PROJECT_ROOT_DIR', (COMPOSER_AUTOLOADER === NOT_FOUND ? NOT_FOUND : dirname(dirname(COMPOSER_AUTOLOADER))));
-define('Kase\VERSION', (json_decode(file_get_contents("{$SRC_DIR}/../composer.json"), true))['version']);
-
-
+define('Kase\VERSION', (json_decode(file_get_contents(__DIR__.'/../composer.json'), true))['version']);

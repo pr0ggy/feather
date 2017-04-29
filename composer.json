@@ -12,19 +12,19 @@
         "pr0ggy/mockleton": "^0.3.0",
         "equip/structure": "^1.1",
         "sebastian/comparator": "^1.2",
-        "nette/finder": "^2.4"
+        "nette/finder": "^2.4",
+        "crazycodr/standard-exceptions": "^2.1"
     },
     "require-dev": {
         "pr0ggy/nark": "^0.2.0",
-        "phpunit/phpunit": "^5.7",
-        "hamcrest/hamcrest-php": "^2.0",
-        "phpdocumentor/phpdocumentor": "2.*"
+        "phpunit/phpunit": "^5.7"
     },
     "autoload": {
         "psr-4" : {
             "Kase\\" : "src/"
         },
         "files": [
+            "src/const.php",
             "src/functions.php"
         ]
     },

@@ -20,9 +20,9 @@ class CreateKaseTestSuiteFileCommandTest extends TestCase
 
     /**
      * @test
-     * @expectedException Kase\NotFoundException
+     * @expectedException Exceptions\IO\Filesystem\DirectoryNotFoundException
      */
-    public function throwsNotFoundException_ifGivenTestDirectoryNotFound()
+    public function throwsException_ifGivenTestDirectoryNotFound()
     {
         list($command, $commandTester) = $this->createCommandAndTester();
         $commandTester->execute([
@@ -43,9 +43,9 @@ class CreateKaseTestSuiteFileCommandTest extends TestCase
 
     /**
      * @test
-     * @expectedException Kase\CollisionException
+     * @expectedException Exceptions\IO\Filesystem\FileAlreadyExistsException
      */
-    public function throwsCollisionException_ifGivenTestFilePathAlreadyExists()
+    public function throwsException_ifGivenTestFilePathAlreadyExists()
     {
         list($command, $commandTester) = $this->createCommandAndTester();
         $commandTester->execute([
