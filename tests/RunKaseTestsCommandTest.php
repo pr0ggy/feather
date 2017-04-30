@@ -90,6 +90,26 @@ class RunKaseTestsCommandTest extends TestCase
     /**
      * @test
      */
+    public function execute_printsErrorMessageToOutput_whenATestSuiteFileDoesNotReturnACallable()
+    {
+        $testFileFixtureDir = __DIR__.'/fixtures/tests';
+        $emptyTestFileFixtureName = 'empty-test-file.php';
+        $expectedAbsoluteFileFixturePath = realpath("{$testFileFixtureDir}/{$emptyTestFileFixtureName}");
+
+        list($command, $commandTester) = $this->createCommandAndTester();
+        $commandTester->execute([
+            'command'  => $command->getName(),
+            '--test-dir' => $testFileFixtureDir,
+            '--file-pattern' => $emptyTestFileFixtureName
+        ]);
+
+        $output = $commandTester->getDisplay();
+        $this->assertContains("Error: Suite file does not return a callable test suite: {$expectedAbsoluteFileFixturePath}", $output);
+    }
+
+    /**
+     * @test
+     */
     public function execute_usesValidatorInstanceDefinedInConfig()
     {
         $kaseConfig = [

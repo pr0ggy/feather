@@ -60,7 +60,7 @@ class RunKaseTestsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // READ CONFIG FROM FILE IF REQUIRED AND SPECIFIED
+        // ----- READ CONFIG FROM FILE IF REQUIRED AND SPECIFIED -----------------------------------
         if (isset($this->config) === false) {
             $configPath = $input->getOption('config');
             if ($configPath) {
@@ -73,7 +73,7 @@ class RunKaseTestsCommand extends Command
             }
         }
 
-        // SET UP TESTING RESOURCES
+        // ----- SET UP TESTING RESOURCES ----------------------------------------------------------
         $metricsLog = [];
         $testingResources = [
             'validator'     => (isset($this->config['validator']) ? $this->config['validator'] : new TestValidator()),
@@ -84,24 +84,36 @@ class RunKaseTestsCommand extends Command
             'console'      => $output // normally shouldn't be used in testing, mostly for unit testing of Kase
         ];
 
-        // SEND RUNNER INITIALIZATION EVENT TO REPORTER
+        // ----- SEND RUNNER INITIALIZATION EVENT TO REPORTER --------------------------------------
         $testingResources['reporter']->registerTestRunnerInitialization();
 
-        // RUN TESTS
+        // ----- RUN TESTS -------------------------------------------------------------------------
         $testSuiteFilePattern = $input->getOption('file-pattern');
         $testSuiteDir = $input->getOption('test-dir');
         if (file_exists($testSuiteDir) === false) {
             $output->writeln("Error: Could not find specified specified test directory: {$testSuiteDir}\n\n");
             return;
         }
+
+        $testSuites = [];
+        // FIRST, VERIFY ALL TEST SUITES ARE 'RUNNABLE'
         foreach (\Nette\Utils\Finder::findFiles($testSuiteFilePattern)->from($testSuiteDir) as $absTestSuiteFilePath => $fileInfo) {
             // $absTestSuiteFilePath is a string containing the absolute filename with path
             // $fileInfo is an instance of SplFileInfo
             $suiteRunner = require $absTestSuiteFilePath;
+            if (is_callable($suiteRunner) === false) {
+                $output->writeln("Error: Suite file does not return a callable test suite: {$absTestSuiteFilePath}\n\n");
+                return;
+            }
+            $testSuites[] = $suiteRunner;
+        }
+
+        // ALL TESTS ARE RUNNABLE...RUN 'EM
+        foreach ($testSuites as $suiteRunner) {
             $suiteRunner($testingResources);
         }
 
-        // REPORT RESULTS
+        // ----- REPORT TESTING RESULTS ------------------------------------------------------------
         $testingResources['reporter']->registerSuiteMetricsSummary($metricsLog);
     }
 }
