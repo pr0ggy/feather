@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "d93c344faff3375bef868d372a47ccd3",
+    "content-hash": "1073688c918748a8097e561da489c678",
     "packages": [
         {
             "name": "crazycodr/standard-exceptions",
@@ -218,49 +218,6 @@
             "description": "Nette Utility Classes",
             "homepage": "https://nette.org",
             "time": "2017-03-29T16:55:54+00:00"
-        },
-        {
-            "name": "pr0ggy/mockleton",
-            "version": "0.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/pr0ggy/mockleton.git",
-                "reference": "0a4f8cfa2039163823dc4ade55a40e5e55376ba0"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/pr0ggy/mockleton/zipball/0a4f8cfa2039163823dc4ade55a40e5e55376ba0",
-                "reference": "0a4f8cfa2039163823dc4ade55a40e5e55376ba0",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^5.6.0|^7.0"
-            },
-            "require-dev": {
-                "peridot-php/peridot": "~1.15"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Mockleton\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Josh Lueken"
-                }
-            ],
-            "description": "A mockable singleton behavior trait",
-            "keywords": [
-                "TDD",
-                "singleton",
-                "testing"
-            ],
-            "time": "2016-07-16T23:58:44+00:00"
         },
         {
             "name": "psr/log",

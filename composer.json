@@ -1,7 +1,7 @@
 {
     "name": "pr0ggy/kase",
     "description": "A lightweight unit testing framework for PHP",
-    "version": "0.3.2",
+    "version": "0.4.0",
     "type": "library",
     "bin": ["./bin/kase"],
     "keywords": ["php", "unit", "testing", "framework"],
@@ -9,7 +9,6 @@
     "require": {
         "php": ">=5.6.0",
         "symfony/console": "2.*",
-        "pr0ggy/mockleton": "^0.3.0",
         "equip/structure": "^1.1",
         "sebastian/comparator": "^1.2",
         "nette/finder": "^2.4",
