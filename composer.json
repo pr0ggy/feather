@@ -12,7 +12,8 @@
         "equip/structure": "^1.1",
         "sebastian/comparator": "^1.2",
         "nette/finder": "^2.4",
-        "crazycodr/standard-exceptions": "^2.1"
+        "crazycodr/standard-exceptions": "^2.1",
+        "pr0ggy/composed-utils": "^0.1.0"
     },
     "require-dev": {
         "pr0ggy/nark": "^0.2.0",

@@ -5,6 +5,7 @@ namespace Kase\Test;
 use PHPUnit\Framework\TestCase;
 use Kase\DefaultKaseCLIReporter;
 use Kase\ValidationFailureException;
+use ComposedUtils;
 use function Nark\occurredSequentially;
 use const Kase\VERSION;
 
@@ -24,7 +25,7 @@ class DefaultKaseCLIReporterTest extends TestCase
         $this->assertTrue(
             occurredSequentially(
                 $outputSpy->writeln(''),
-                $outputSpy->writeln('Kase '.VERSION),
+                $outputSpy->writeln('Kase '.ComposedUtils\getComposerConfigValue('version')),
                 $outputSpy->writeln('')
             ),
             'reporter did not print the Kase version number to the output interface as expected'

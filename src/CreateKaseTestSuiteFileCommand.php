@@ -8,6 +8,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Exceptions\IO\Filesystem;
+use ComposedUtils;
 
 /**
  * Symfony component console command which will create a new Kase test suite file at a path relative
@@ -31,7 +32,7 @@ class CreateKaseTestSuiteFileCommand extends Command
                 '-d',
                 InputOption::VALUE_REQUIRED,
                 'The directory where tests are located',
-                CLIENT_PROJECT_ROOT.'/tests'
+                ComposedUtils\getProjectRoot().'/tests'
             )
             ->addOption(
                 'namespace',

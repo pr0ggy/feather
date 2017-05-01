@@ -5,6 +5,7 @@ namespace Kase;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use ComposedUtils;
 
 // VERIFY PHP VERSION
 if (version_compare('5.6.0', PHP_VERSION, '>') && $argv[1] !== '--version') {
@@ -25,7 +26,7 @@ if (version_compare('5.6.0', PHP_VERSION, '>') && $argv[1] !== '--version') {
 require __DIR__.'/../src/autoload.php';
 
 // CREATE KASE APP AND LAUNCHER COMMAND
-$KaseApp = new Application('Kase', VERSION);
+$KaseApp = new Application('Kase', ComposedUtils\getComposerConfigValue('version'));
 $KaseRunTestsCommand = new RunKaseTestsCommand();
 $KaseApp->add($KaseRunTestsCommand);
 $KaseApp->add(new CreateKaseTestSuiteFileCommand());
