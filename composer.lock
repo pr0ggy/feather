@@ -221,16 +221,16 @@
         },
         {
             "name": "pr0ggy/composed-utils",
-            "version": "0.1.0",
+            "version": "0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pr0ggy/composed-utils.git",
-                "reference": "57e13dd09b623defb96dd88922c0f29bf67fb609"
+                "reference": "b0e937ce0131a36f2a86987d74cefed262e35aae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pr0ggy/composed-utils/zipball/57e13dd09b623defb96dd88922c0f29bf67fb609",
-                "reference": "57e13dd09b623defb96dd88922c0f29bf67fb609",
+                "url": "https://api.github.com/repos/pr0ggy/composed-utils/zipball/b0e937ce0131a36f2a86987d74cefed262e35aae",
+                "reference": "b0e937ce0131a36f2a86987d74cefed262e35aae",
                 "shasum": ""
             },
             "require": {
@@ -239,9 +239,6 @@
             "require-dev": {
                 "phpunit/phpunit": "^5.7"
             },
-            "bin": [
-                "./autoload.php"
-            ],
             "type": "library",
             "autoload": {
                 "files": [
@@ -261,7 +258,7 @@
                 "utilities",
                 "utils"
             ],
-            "time": "2017-05-01T01:47:30+00:00"
+            "time": "2017-05-01T14:28:05+00:00"
         },
         {
             "name": "psr/log",
