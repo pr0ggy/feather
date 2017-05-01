@@ -4,7 +4,6 @@ namespace Kase;
 
 use SebastianBergmann\Comparator;
 use Symfony\Component\Console\Output\OutputInterface;
-use ComposedUtils;
 
 /**
  * Built-in simple CLI reporter for the Kase testing framework
@@ -39,7 +38,7 @@ class DefaultKaseCLIReporter implements Reporter
     public function registerTestRunnerInitialization()
     {
         $this->writeBlankLineToOutput();
-        $this->writeLineToOutput('Kase '.ComposedUtils\getComposerConfigValue('version'));
+        $this->writeLineToOutput('Kase '.VERSION);
         $this->writeBlankLineToOutput();
     }
 

@@ -34,8 +34,9 @@ class CreateKaseTestSuiteFileCommandTest extends TestCase
 
     private function createCommandAndTester()
     {
+        $kaseProjectRoot = realpath(__DIR__.'/..');
         $application = new Application();
-        $application->add(new CreateKaseTestSuiteFileCommand());
+        $application->add(new CreateKaseTestSuiteFileCommand($kaseProjectRoot));
 
         $command = $application->find('create-suite');
         return [$command, new CommandTester($command)];

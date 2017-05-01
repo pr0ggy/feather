@@ -1,7 +1,7 @@
 {
     "name": "pr0ggy/kase",
     "description": "A lightweight unit testing framework for PHP",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "type": "library",
     "bin": ["./bin/kase"],
     "link_autoloader": true,
@@ -13,8 +13,7 @@
         "equip/structure": "^1.1",
         "sebastian/comparator": "^1.2",
         "nette/finder": "^2.4",
-        "crazycodr/standard-exceptions": "^2.1",
-        "pr0ggy/composed-utils": "^0.1.0"
+        "crazycodr/standard-exceptions": "^2.1"
     },
     "require-dev": {
         "pr0ggy/nark": "^0.2.0",
