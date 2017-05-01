@@ -16,14 +16,6 @@ use RuntimeException;
  */
 class RunKaseTestsCommand extends Command
 {
-    private $config;
-
-    public function __construct(array $config = null)
-    {
-        $this->config = $config;
-        parent::__construct();
-    }
-
     /**
      * Defines the command name and available options
      */
@@ -61,23 +53,36 @@ class RunKaseTestsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // ----- READ CONFIG FROM FILE IF REQUIRED AND SPECIFIED -----------------------------------
-        if (isset($this->config) === false) {
-            $configPath = $input->getOption('config');
-            if ($configPath) {
-                if (file_exists($configPath)) {
-                    $this->config = require $configPath;
-                } else {
-                    $output->writeln("Error: Could not find specified Kase config file: {$configPath}\n\n");
+        $config = [];
+        $configPath = $input->getOption('config');
+        if ($configPath) {
+            if (file_exists($configPath)) {
+                $config = require $configPath;
+                if (is_array($config) === false) {
+                    $output->writeln("Error: Specified config file does not return a key/value map\n\n");
                     return;
                 }
+            } else {
+                $output->writeln("Error: Could not find specified Kase config file: {$configPath}\n\n");
+                return;
             }
+        }
+
+        // ----- INCLUDE BOOTSTRAP IF DEFINED ------------------------------------------------------
+        if (array_key_exists('bootstrap', $config)) {
+            if (is_file($config['bootstrap']) === false) {
+                $output->writeln("Error: Specified bootstrap could not be found: {$config['bootstrap']}\n\n");
+                return;
+            }
+
+            require $config['bootstrap'];
         }
 
         // ----- SET UP TESTING RESOURCES ----------------------------------------------------------
         $metricsLog = [];
         $testingResources = [
-            'validator'     => (isset($this->config['validator']) ? $this->config['validator'] : new TestValidator()),
-            'reporter'      => (isset($this->config['reporter']) ? $this->config['reporter'] : new DefaultKaseCLIReporter($output)),
+            'validator'     => (isset($config['validator']) ? $config['validator'] : new TestValidator()),
+            'reporter'      => (isset($config['reporter']) ? $config['reporter'] : new DefaultKaseCLIReporter($output)),
             'metricsLogger' => function ($metricsToRecord) use (&$metricsLog) {
                 $metricsLog[] = $metricsToRecord;
             },

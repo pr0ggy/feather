@@ -8,6 +8,14 @@
 return [
 
     /*
+     * OPTIONAL KEY: bootstrap
+     * TYPE: string
+     *
+     * This file will be included before any Kase test suites run
+     */
+    'bootstrap' => realpath(__DIR__.'/bootstrap.php'),
+
+    /*
      * OPTIONAL KEY: validator
      * TYPE: any
      *
