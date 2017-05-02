@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Equip\Structure\Dictionary;
 use function Nark\createSpyInstanceOf;
 use function Nark\occurredChronologically;
-use Kase\ValidationFailureException;
+use Kase\Validation\ValidationFailureException;
 use const Kase\TEST_MODE_NORMAL;
 use const Kase\TEST_MODE_SKIPPED;
 use const Kase\TEST_MODE_ISOLATED;
@@ -133,8 +133,8 @@ class FunctionsTest extends TestCase
     private function createFakeTestingResources($overrides = [])
     {
         return [
-            'validator'     => (isset($overrides['validator']) ? $overrides['validator'] : createSpyInstanceOf('\Kase\TestValidator')),
-            'reporter'      => (isset($overrides['reporter']) ? $overrides['reporter'] : createSpyInstanceOf('\Kase\Reporter')),
+            'validator'     => (isset($overrides['validator']) ? $overrides['validator'] : createSpyInstanceOf('\Kase\Validation\TestValidator')),
+            'reporter'      => (isset($overrides['reporter']) ? $overrides['reporter'] : createSpyInstanceOf('\Kase\Reporting\Reporter')),
             'metricsLogger' => (isset($overrides['metricsLogger']) ? $overrides['metricsLogger'] : function($metrics) {/*no-op*/})
         ];
     }
@@ -236,7 +236,7 @@ class FunctionsTest extends TestCase
     {
         $someTestValidationFailureException = new ValidationFailureException('some validation failure message');
         $fakeTestingResources = $this->createFakeTestingResources([
-            'validator' => createSpyInstanceOf('\Kase\TestValidator', [
+            'validator' => createSpyInstanceOf('\Kase\Validation\TestValidator', [
                 'fail' => \nark\throwsException($someTestValidationFailureException)
             ])
         ]);
@@ -289,7 +289,7 @@ class FunctionsTest extends TestCase
         $someTestValidationFailureException = new ValidationFailureException('some validation failure message');
         $testCaseMetricsLog = [];
         $fakeTestingResources = $this->createFakeTestingResources([
-            'validator' => createSpyInstanceOf('\Kase\TestValidator', [
+            'validator' => createSpyInstanceOf('\Kase\Validation\TestValidator', [
                 'fail' => \nark\throwsException($someTestValidationFailureException)
             ]),
             'metricsLogger' => function ($metricsToLog) use (&$testCaseMetricsLog) { $testCaseMetricsLog[] = $metricsToLog; }

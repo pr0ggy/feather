@@ -3,7 +3,7 @@
 namespace Kase\Test;
 
 use PHPUnit\Framework\TestCase;
-use Kase\ValidationFailureException;
+use Kase\Validation\ValidationFailureException;
 
 class ValidationFailureExceptionTest extends TestCase
 {

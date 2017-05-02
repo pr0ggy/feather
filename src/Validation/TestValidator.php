@@ -1,6 +1,6 @@
 <?php
 
-namespace Kase;
+namespace Kase\Validation;
 
 use BadMethodCallException;
 

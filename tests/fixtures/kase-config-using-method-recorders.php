@@ -1,6 +1,6 @@
 <?php
 
-use Kase\Test\Utils\MethodRecorderContainer;
+use Kase\Test\TestUtils\MethodRecorderContainer;
 
 return [
     'reporter' => MethodRecorderContainer::newInstance(),

@@ -1,6 +1,8 @@
 <?php
 
-namespace Kase;
+namespace Kase\Reporting;
+
+use Kase\Validation\ValidationFailureException;
 
 /**
  * Interface defining methods which are used by the test runner to report on testing events
@@ -13,7 +15,7 @@ interface Reporter
      * Called by the test runner just after setting up all testing resources and just before running test suites
      */
     public function registerTestRunnerInitialization();
- 
+
     /**
      * Called by the test runner just before running the tests within a suite
      *

@@ -30,7 +30,7 @@ return [
      * overriding the testing resources with a Kase\TestValidator instance loaded with custom
      * validation methods can be found in the example below.
      */
-    'validator' => new Kase\TestValidator([
+    'validator' => new Kase\Validation\TestValidator([
         'assertEvenInteger' =>
             function ($value, $message = 'Failed to assert that the given value was an even integer') {
                 if (is_int($value) && ($value % 2) === 0) {

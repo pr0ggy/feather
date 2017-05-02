@@ -1,9 +1,11 @@
 <?php
 
-namespace Kase;
+namespace Kase\Reporting;
 
 use SebastianBergmann\Comparator;
 use Symfony\Component\Console\Output\OutputInterface;
+use Kase\Validation\ValidationFailureException;
+use const Kase\VERSION;
 
 /**
  * Built-in simple CLI reporter for the Kase testing framework

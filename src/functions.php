@@ -54,17 +54,16 @@ function runner($suiteDescription, ...$suiteTests)
         foreach ($testsToRun as $test) {
             try {
                 if ($test['runMode'] === TEST_MODE_SKIPPED) {
-                    throw new SkippedTestException();
+                    $suiteMetrics['skippedTests'][] = $test['description'];
+                    $testReporter->registerSkippedTest($test['description']);
+                    continue;
                 }
 
                 $testDefinition = $test['definition'];
                 $testDefinition($testValidator);
                 ++$suiteMetrics['passedTestCount'];
                 $testReporter->registerPassedTest($test['description']);
-            } catch (SkippedTestException $exception) {
-                $suiteMetrics['skippedTests'][] = $test['description'];
-                $testReporter->registerSkippedTest($test['description']);
-            } catch (ValidationFailureException $exception) {
+            } catch (Validation\ValidationFailureException $exception) {
                 $suiteMetrics['failedTests'][$test['description']] = $exception;
                 $testReporter->registerFailedTest($test['description'], $exception);
             } catch (\Exception $exception) {

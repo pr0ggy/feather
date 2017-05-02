@@ -3,8 +3,8 @@
 namespace Kase\Test;
 
 use PHPUnit\Framework\TestCase;
-use Kase\DefaultKaseCLIReporter;
-use Kase\ValidationFailureException;
+use Kase\Reporting\DefaultKaseCLIReporter;
+use Kase\Validation\ValidationFailureException;
 use function Nark\occurredSequentially;
 use const Kase\VERSION;
 

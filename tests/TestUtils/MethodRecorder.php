@@ -1,6 +1,6 @@
 <?php
 
-namespace Kase\Test\Utils;
+namespace Kase\Test\TestUtils;
 
 class MethodRecorder
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Kase;
+namespace Kase\Validation;
 
 /**
  * Exception sublcass thrown by a \Kase\TestValidator instance in the event that validation fails

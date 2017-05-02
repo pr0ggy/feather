@@ -7,7 +7,8 @@ use Symfony\Component\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use function Nark\createSpyInstanceOf;
-use Kase\RunKaseTestsCommand;
+use Kase\Console\RunKaseTestsCommand;
+use Kase\Utils;
 
 class RunKaseTestsCommandTest extends TestCase
 {
@@ -19,11 +20,13 @@ class RunKaseTestsCommandTest extends TestCase
         list($command, $commandTester) = $this->createCommandAndTester();
         $commandTester->execute([
             'command'  => $command->getName(),
-            '--config' => 'tests/fixtures/nonexistent-config.php'
+            '--test-dir' => Utils\pathFromKaseProjectRoot('/tests'),
+            '--config' => Utils\pathFromKaseProjectRoot('/tests/fixtures/nonexistent-config.php')
         ]);
 
         $output = $commandTester->getDisplay();
-        $this->assertContains('Error: Could not find specified Kase config file: tests/fixtures/nonexistent-config.php', $output);
+        $expectedTestDirRealPath = realpath(__DIR__.'/..');
+        $this->assertContains("Error: Could not find specified Kase config file: {$expectedTestDirRealPath}/fixtures/nonexistent-config.php", $output);
     }
 
     private function createCommandAndTester($kaseConfig = null)
@@ -43,7 +46,7 @@ class RunKaseTestsCommandTest extends TestCase
         list($command, $commandTester) = $this->createCommandAndTester();
         $commandTester->execute([
             'command'  => $command->getName(),
-            '--config' => 'tests/fixtures/kase-config-not-returning-kv-map.php'
+            '--config' => Utils\pathFromKaseProjectRoot('tests/fixtures/kase-config-not-returning-kv-map.php')
         ]);
 
         $output = $commandTester->getDisplay();
@@ -58,15 +61,15 @@ class RunKaseTestsCommandTest extends TestCase
         list($command, $commandTester) = $this->createCommandAndTester();
         $commandTester->execute([
             'command'  => $command->getName(),
-            '--config' => 'tests/fixtures/kase-config-using-method-recorders.php',
-            '--test-dir' => __DIR__.'/fixtures/tests'
+            '--config' => Utils\pathFromKaseProjectRoot('tests/fixtures/kase-config-using-method-recorders.php'),
+            '--test-dir' => Utils\pathFromKaseProjectRoot('/tests/fixtures/tests')
         ]);
 
-        // Utils\MethodRecorderContainer is used within the config file specified above to define a
+        // TestUtils\MethodRecorderContainer is used within the config file specified above to define a
         // few fake resources.  See the config file specified above as well as the MethodRecorderContainer
         // class to understand what's happening here.  There may be a simpler way to implement/test
         // this but I'm not certain of it at the moment
-        list($reporter, $validator) = Utils\MethodRecorderContainer::getLastNRecorders(2);
+        list($reporter, $validator) = TestUtils\MethodRecorderContainer::getLastNRecorders(2);
         $numberOfFixtureTestsFiles = 3; // Number of fake test files located in tests/fixtures/tests
         $this->assertEquals($numberOfFixtureTestsFiles, $validator->callCountForMethod('pass'),
             'validator defined in config not used by runner as expected');
@@ -85,7 +88,7 @@ class RunKaseTestsCommandTest extends TestCase
         $commandTester->execute([
             'command'  => $command->getName(),
             '--config' => 'tests/fixtures/kase-config-defining-bootstrap.php',
-            '--test-dir' => __DIR__.'/fixtures/tests'
+            '--test-dir' => __DIR__.'/../fixtures/tests'
         ]);
 
         $this->assertTrue(defined('Kase\Test\BOOTSTRAP_INCLUDED'),
@@ -101,7 +104,7 @@ class RunKaseTestsCommandTest extends TestCase
         $commandTester->execute([
             'command'  => $command->getName(),
             '--config' => 'tests/fixtures/kase-config-defining-missing-bootstrap.php',
-            '--test-dir' => __DIR__.'/fixtures/tests'
+            '--test-dir' => __DIR__.'/../fixtures/tests'
         ]);
 
         $expectedBootstrapPath = realpath(__DIR__.'/fixtures/kase-bootstrap-that-does-not-exist.php');
@@ -117,7 +120,7 @@ class RunKaseTestsCommandTest extends TestCase
         list($command, $commandTester) = $this->createCommandAndTester();
         $commandTester->execute([
             'command'  => $command->getName(),
-            '--test-dir' => __DIR__.'/fixtures/tests/Bar'
+            '--test-dir' => __DIR__.'/../fixtures/tests/Bar'
         ]);
 
         $output = $commandTester->getDisplay();
@@ -131,7 +134,7 @@ class RunKaseTestsCommandTest extends TestCase
      */
     public function execute_printsErrorMessageToOutput_whenSpecifiedTestDirNotFound()
     {
-        $nonexistentDir = __DIR__.'/fixtures/tests/NonexistentDir';
+        $nonexistentDir = __DIR__.'/../fixtures/tests/NonexistentDir';
         list($command, $commandTester) = $this->createCommandAndTester();
         $commandTester->execute([
             'command'  => $command->getName(),
@@ -151,7 +154,7 @@ class RunKaseTestsCommandTest extends TestCase
         $commandTester->execute([
             'command'  => $command->getName(),
             '--file-pattern' => '*-1.test.php',
-            '--test-dir' => __DIR__.'/fixtures/tests'
+            '--test-dir' => __DIR__.'/../fixtures/tests'
         ]);
 
         $output = $commandTester->getDisplay();
@@ -165,9 +168,9 @@ class RunKaseTestsCommandTest extends TestCase
      */
     public function execute_printsErrorMessageToOutput_whenATestSuiteFileDoesNotReturnACallable()
     {
-        $testFileFixtureDir = __DIR__.'/fixtures/tests';
+        $testFileFixtureDir = realpath(__DIR__.'/../fixtures/tests');
         $emptyTestFileFixtureName = 'empty-test-file.php';
-        $expectedAbsoluteFileFixturePath = realpath("{$testFileFixtureDir}/{$emptyTestFileFixtureName}");
+        $expectedAbsoluteFileFixturePath = "{$testFileFixtureDir}/{$emptyTestFileFixtureName}";
 
         list($command, $commandTester) = $this->createCommandAndTester();
         $commandTester->execute([

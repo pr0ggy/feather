@@ -6,17 +6,18 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
-use Kase\CreateKaseTestSuiteFileCommand;
+use Kase\Console\CreateKaseTestSuiteFileCommand;
 use function Nark\createSpyInstanceOf;
+use Kase\Utils;
 
 class CreateKaseTestSuiteFileCommandTest extends TestCase
 {
-    const TEST_CREATION_DIR = __DIR__.'/fixtures';
+    const TEST_CREATION_DIR = __DIR__.'/../tmp';
     const EXISTING_TEST_NAME = 'fakeExistingTestFile';
     const CREATED_TEST_FILE_NAME = 'newTestFile';
-    const CREATED_TEST_FILE_PATH = __DIR__.'/fixtures/newTestFile.php';
-    const EXPECTED_BOILERPLATE_TEST_SUITE_WITHOUT_NAMESPACE_FILE_PATH = __DIR__.'/fixtures/expectedKaseTestSuiteBoilerplateFileWithoutNamespace.php';
-    const EXPECTED_BOILERPLATE_TEST_SUITE_WITH_FOO_NAMESPACE_FILE_PATH = __DIR__.'/fixtures/expectedKaseTestSuiteBoilerplateFileWithFooNamespace.php';
+    const CREATED_TEST_FILE_PATH = __DIR__.'/../tmp/newTestFile.php';
+    const EXPECTED_BOILERPLATE_TEST_SUITE_WITHOUT_NAMESPACE_FILE_PATH = __DIR__.'/../fixtures/expectedKaseTestSuiteBoilerplateFileWithoutNamespace.php';
+    const EXPECTED_BOILERPLATE_TEST_SUITE_WITH_FOO_NAMESPACE_FILE_PATH = __DIR__.'/../fixtures/expectedKaseTestSuiteBoilerplateFileWithFooNamespace.php';
 
     /**
      * @test
@@ -34,9 +35,8 @@ class CreateKaseTestSuiteFileCommandTest extends TestCase
 
     private function createCommandAndTester()
     {
-        $kaseProjectRoot = realpath(__DIR__.'/..');
         $application = new Application();
-        $application->add(new CreateKaseTestSuiteFileCommand($kaseProjectRoot));
+        $application->add(new CreateKaseTestSuiteFileCommand(Utils\pathFromKaseProjectRoot('/')));
 
         $command = $application->find('create-suite');
         return [$command, new CommandTester($command)];
@@ -51,7 +51,7 @@ class CreateKaseTestSuiteFileCommandTest extends TestCase
         list($command, $commandTester) = $this->createCommandAndTester();
         $commandTester->execute([
             'command'  => $command->getName(),
-            '--test-dir' => self::TEST_CREATION_DIR,
+            '--test-dir' => __DIR__.'/../fixtures',
             'file-path' => self::EXISTING_TEST_NAME
         ]);
     }

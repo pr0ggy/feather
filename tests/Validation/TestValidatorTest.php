@@ -3,8 +3,8 @@
 namespace Kase\Test;
 
 use PHPUnit\Framework\TestCase;
-use Kase\TestValidator;
-use Kase\ValidationFailureException;
+use Kase\Validation\TestValidator;
+use Kase\Validation\ValidationFailureException;
 
 class TestValidatorTest extends TestCase
 {
@@ -81,7 +81,7 @@ class TestValidatorTest extends TestCase
 
     /**
      * @test
-     * @expectedException \Kase\ValidationFailureException
+     * @expectedException \Kase\Validation\ValidationFailureException
      * @expectedExceptionMessage Validation failure message
      */
     public function fail_throwsValidationFailureExceptionWithGivenMessage()
@@ -134,7 +134,7 @@ class TestValidatorTest extends TestCase
     {
         $sut = new TestValidator();
         $expectedValidationFailureMessage = 'Validation failure message';
-        $entityPairGenerator = new Utils\EqualityTestGenerator();
+        $entityPairGenerator = new TestUtils\EqualityTestGenerator();
 
         foreach ($entityPairGenerator->generatedLooseEqualityFailurePairs() as list(list($entityA, $entityB), $entityTypeDescription)) {
             try {
@@ -163,7 +163,7 @@ class TestValidatorTest extends TestCase
     public function assertEqual_doesNotThrow_whenGivenEntitiesExhibitEquality()
     {
         $sut = new TestValidator();
-        $entityPairGenerator = new Utils\EqualityTestGenerator();
+        $entityPairGenerator = new TestUtils\EqualityTestGenerator();
 
         foreach ($entityPairGenerator->generatedLooseEqualitySuccessPairs() as list(list($entityA, $entityB), $entityTypeDescription)) {
             $sut->assertEqual($entityA, $entityB, "
@@ -183,7 +183,7 @@ class TestValidatorTest extends TestCase
     {
         $sut = new TestValidator();
         $expectedValidationFailureMessage = 'Validation failure message';
-        $entityPairGenerator = new Utils\EqualityTestGenerator();
+        $entityPairGenerator = new TestUtils\EqualityTestGenerator();
 
         foreach ($entityPairGenerator->generatedStrictEqualityFailurePairs() as list(list($entityA, $entityB), $entityTypeDescription)) {
             try {
@@ -212,7 +212,7 @@ class TestValidatorTest extends TestCase
     public function assertSame_doesNotThrow_whenGivenEntitiesExhibitIdentityEquality()
     {
         $sut = new TestValidator();
-        $entityPairGenerator = new Utils\EqualityTestGenerator();
+        $entityPairGenerator = new TestUtils\EqualityTestGenerator();
 
         foreach ($entityPairGenerator->generatedStrictEqualitySuccessPairs() as list(list($entityA, $entityB), $entityTypeDescription)) {
             $sut->assertEqual($entityA, $entityB, "

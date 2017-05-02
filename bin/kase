@@ -3,7 +3,7 @@
 
 namespace Kase;
 
-use Symfony\Component\Console;
+use Symfony\Component\Console\Application;
 
 // ----- REQUIRE AUTOLOADER / DEFINE PROJECT ROOT --------------------------------------------------
 if (is_file(__DIR__.'/../../../autoload.php')) {
@@ -25,10 +25,10 @@ if (is_file(__DIR__.'/../../../autoload.php')) {
 }
 
 // ----- CREATE KASE APP AND LAUNCHER COMMAND ------------------------------------------------------
-$KaseApp = new Console\Application('Kase', VERSION);
-$KaseRunTestsCommand = new RunKaseTestsCommand();
+$KaseApp = new Application('Kase', VERSION);
+$KaseRunTestsCommand = new Console\RunKaseTestsCommand();
 $KaseApp->add($KaseRunTestsCommand);
-$KaseApp->add(new CreateKaseTestSuiteFileCommand(ACTIVE_PROJECT_ROOT));
+$KaseApp->add(new Console\CreateKaseTestSuiteFileCommand(ACTIVE_PROJECT_ROOT));
 $KaseApp->setDefaultCommand($KaseRunTestsCommand->getName(), true);
 
 // ----- CLEANUP GLOBALS ---------------------------------------------------------------------------
