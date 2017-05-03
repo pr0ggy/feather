@@ -1,10 +1,11 @@
 <?php
 
-namespace Kase\Test;
+namespace Kase\Test\Validation;
 
 use PHPUnit\Framework\TestCase;
 use Kase\Validation\TestValidator;
 use Kase\Validation\ValidationFailureException;
+use Kase\Test\TestUtils;
 
 class TestValidatorTest extends TestCase
 {

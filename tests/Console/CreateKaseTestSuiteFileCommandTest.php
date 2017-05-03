@@ -1,6 +1,6 @@
 <?php
 
-namespace Kase\Test;
+namespace Kase\Test\Console;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
@@ -9,15 +9,13 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Kase\Console\CreateKaseTestSuiteFileCommand;
 use function Nark\createSpyInstanceOf;
 use Kase\Utils;
+use Kase\Test\Base;
 
-class CreateKaseTestSuiteFileCommandTest extends TestCase
+class CreateKaseTestSuiteFileCommandTest extends Base\KaseCommandTestCase
 {
-    const TEST_CREATION_DIR = __DIR__.'/../tmp';
-    const EXISTING_TEST_NAME = 'fakeExistingTestFile';
-    const CREATED_TEST_FILE_NAME = 'newTestFile';
-    const CREATED_TEST_FILE_PATH = __DIR__.'/../tmp/newTestFile.php';
-    const EXPECTED_BOILERPLATE_TEST_SUITE_WITHOUT_NAMESPACE_FILE_PATH = __DIR__.'/../fixtures/expectedKaseTestSuiteBoilerplateFileWithoutNamespace.php';
-    const EXPECTED_BOILERPLATE_TEST_SUITE_WITH_FOO_NAMESPACE_FILE_PATH = __DIR__.'/../fixtures/expectedKaseTestSuiteBoilerplateFileWithFooNamespace.php';
+    const TEST_SANDBOX_DIR = __DIR__.'/../test-creation-sandbox';
+    const EXPECTED_BOILERPLATE_TEST_SUITE_WITHOUT_NAMESPACE = __DIR__.'/../fixtures/expectedKaseTestSuiteBoilerplateFileWithoutNamespace.php';
+    const EXPECTED_BOILERPLATE_TEST_SUITE_WITH_FOO_NAMESPACE = __DIR__.'/../fixtures/expectedKaseTestSuiteBoilerplateFileWithFooNamespace.php';
 
     /**
      * @test
@@ -25,21 +23,18 @@ class CreateKaseTestSuiteFileCommandTest extends TestCase
      */
     public function throwsException_ifGivenTestDirectoryNotFound()
     {
-        list($command, $commandTester) = $this->createCommandAndTester();
-        $commandTester->execute([
-            'command'  => $command->getName(),
-            '--test-dir' => 'this-dir-doesnt-exist',
-            'file-path' => 'someNewTest'
-        ]);
+        $this->runCommandTest(
+            $this->createCommandSUT(),
+            [
+                '--test-dir' => __DIR__.'/this-dir-doesnt-exist',
+                'file-path' => 'someNewTest'
+            ]
+        );
     }
 
-    private function createCommandAndTester()
+    protected function createCommandSUT(...$creationArgs)
     {
-        $application = new Application();
-        $application->add(new CreateKaseTestSuiteFileCommand(Utils\pathFromKaseProjectRoot('/')));
-
-        $command = $application->find('create-suite');
-        return [$command, new CommandTester($command)];
+        return new CreateKaseTestSuiteFileCommand(Utils\pathFromKaseProjectRoot('/'));
     }
 
     /**
@@ -48,12 +43,36 @@ class CreateKaseTestSuiteFileCommandTest extends TestCase
      */
     public function throwsException_ifGivenTestFilePathAlreadyExists()
     {
-        list($command, $commandTester) = $this->createCommandAndTester();
-        $commandTester->execute([
-            'command'  => $command->getName(),
-            '--test-dir' => __DIR__.'/../fixtures',
-            'file-path' => self::EXISTING_TEST_NAME
-        ]);
+        try {
+            $someTestSuiteFileName = 'someTestSuite';
+            $this->createTestFileInSandbox($someTestSuiteFileName);
+
+            $this->runCommandTest(
+                $this->createCommandSUT(),
+                [
+                    '--test-dir' => self::TEST_SANDBOX_DIR,
+                    'file-path' => $someTestSuiteFileName
+                ]
+            );
+        } finally {
+            $this->cleanupTestSandbox();
+        }
+    }
+
+    private function createTestFileInSandbox($fileName)
+    {
+        $fullFilePath = self::TEST_SANDBOX_DIR."/{$fileName}.php";
+        file_put_contents($fullFilePath, '');
+    }
+
+    private function cleanupTestSandbox()
+    {
+        $files = glob(self::TEST_SANDBOX_DIR.'/*');
+        foreach($files as $file){
+            if (is_file($file)) {
+                unlink($file);
+            }
+        }
     }
 
     /**
@@ -61,17 +80,24 @@ class CreateKaseTestSuiteFileCommandTest extends TestCase
      */
     public function createsANewTestFileWithGivenNameInGivenDirectory()
     {
-        list($command, $commandTester) = $this->createCommandAndTester();
-        $commandTester->execute([
-            'command'  => $command->getName(),
-            '--test-dir' => self::TEST_CREATION_DIR,
-            'file-path' => self::CREATED_TEST_FILE_NAME
-        ]);
+        try {
+            $someTestSuiteFileName = 'someTestSuite';
+            $expectedFilePathCreated = self::TEST_SANDBOX_DIR."/{$someTestSuiteFileName}.php";
 
-        if (file_exists(self::CREATED_TEST_FILE_PATH)) {
-            unlink(self::CREATED_TEST_FILE_PATH);
-        } else {
-            $this->fail('Failed to create test suite file');
+            $this->cleanupTestSandbox();
+            $this->runCommandTest(
+                $this->createCommandSUT(),
+                [
+                    '--test-dir' => self::TEST_SANDBOX_DIR,
+                    'file-path' => $someTestSuiteFileName
+                ]
+            );
+
+            if (file_exists($expectedFilePathCreated) === false) {
+                $this->fail('Failed to create expected test suite file');
+            }
+        } finally {
+            $this->cleanupTestSandbox();
         }
     }
 
@@ -80,18 +106,26 @@ class CreateKaseTestSuiteFileCommandTest extends TestCase
      */
     public function createdTestFileShouldContainExpectedBootstrapTestCode_whenNoNamespaceSpecified()
     {
-        list($command, $commandTester) = $this->createCommandAndTester();
-        $commandTester->execute([
-            'command'  => $command->getName(),
-            '--test-dir' => self::TEST_CREATION_DIR,
-            'file-path' => self::CREATED_TEST_FILE_NAME
-        ]);
+        try {
+            $someTestSuiteFileName = 'someTestSuite';
+            $expectedFilePathCreated = self::TEST_SANDBOX_DIR."/{$someTestSuiteFileName}.php";
 
-        $createdFileContentsAsExpected = (file_get_contents(self::CREATED_TEST_FILE_PATH) === file_get_contents(self::EXPECTED_BOILERPLATE_TEST_SUITE_WITHOUT_NAMESPACE_FILE_PATH));
-        if ($createdFileContentsAsExpected) {
-            unlink(self::CREATED_TEST_FILE_PATH);
-        } else {
-            $this->fail("The created test suite file did not have the expected contents\nCompare ".self::EXPECTED_BOILERPLATE_TEST_SUITE_WITHOUT_NAMESPACE_FILE_PATH.' to '.self::CREATED_TEST_FILE_PATH);
+            $this->cleanupTestSandbox();
+            $this->runCommandTest(
+                $this->createCommandSUT(),
+                [
+                    '--test-dir' => self::TEST_SANDBOX_DIR,
+                    'file-path' => $someTestSuiteFileName
+                ]
+            );
+
+            $this->assertEquals(
+                file_get_contents(self::EXPECTED_BOILERPLATE_TEST_SUITE_WITHOUT_NAMESPACE),
+                file_get_contents($expectedFilePathCreated),
+                'The created test suite file did not have the expected contents'
+            );
+        } finally {
+            $this->cleanupTestSandbox();
         }
     }
 
@@ -100,19 +134,27 @@ class CreateKaseTestSuiteFileCommandTest extends TestCase
      */
     public function createdTestFileShouldContainExpectedBootstrapTestCode_whenNamespaceSpecified()
     {
-        list($command, $commandTester) = $this->createCommandAndTester();
-        $commandTester->execute([
-            'command'  => $command->getName(),
-            '--test-dir' => self::TEST_CREATION_DIR,
-            '--namespace' => 'Foo',
-            'file-path' => self::CREATED_TEST_FILE_NAME
-        ]);
+        try {
+            $someTestSuiteFileName = 'someTestSuite';
+            $expectedFilePathCreated = self::TEST_SANDBOX_DIR."/{$someTestSuiteFileName}.php";
 
-        $createdFileContentsAsExpected = (file_get_contents(self::CREATED_TEST_FILE_PATH) === file_get_contents(self::EXPECTED_BOILERPLATE_TEST_SUITE_WITH_FOO_NAMESPACE_FILE_PATH));
-        if ($createdFileContentsAsExpected) {
-            unlink(self::CREATED_TEST_FILE_PATH);
-        } else {
-            $this->fail("The created test suite file did not have the expected contents\nCompare ".self::EXPECTED_BOILERPLATE_TEST_SUITE_WITH_FOO_NAMESPACE_FILE_PATH.' to '.self::CREATED_TEST_FILE_PATH);
+            $this->cleanupTestSandbox();
+            $this->runCommandTest(
+                $this->createCommandSUT(),
+                [
+                    '--test-dir' => self::TEST_SANDBOX_DIR,
+                    '--namespace' => 'Foo',
+                    'file-path' => $someTestSuiteFileName
+                ]
+            );
+
+            $this->assertEquals(
+                file_get_contents(self::EXPECTED_BOILERPLATE_TEST_SUITE_WITH_FOO_NAMESPACE),
+                file_get_contents($expectedFilePathCreated),
+                'The created test suite file did not have the expected contents'
+            );
+        } finally {
+            $this->cleanupTestSandbox();
         }
     }
 }

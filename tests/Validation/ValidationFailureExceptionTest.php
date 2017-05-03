@@ -1,6 +1,6 @@
 <?php
 
-namespace Kase\Test;
+namespace Kase\Test\Validation;
 
 use PHPUnit\Framework\TestCase;
 use Kase\Validation\ValidationFailureException;

@@ -1,41 +1,38 @@
 <?php
 
-namespace Kase\Test;
+namespace Kase\Test\Console;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\Console\Tester\CommandTester;
 use function Nark\createSpyInstanceOf;
 use Kase\Console\RunKaseTestsCommand;
 use Kase\Utils;
+use Kase\Test\TestUtils;
+use Kase\Test\Base;
 
-class RunKaseTestsCommandTest extends TestCase
+class RunKaseTestsCommandTest extends Base\KaseCommandTestCase
 {
     /**
      * @test
      */
     public function execute_printsErrorMessageToOutput_whenConfigPathGivenButNotFound()
     {
-        list($command, $commandTester) = $this->createCommandAndTester();
-        $commandTester->execute([
-            'command'  => $command->getName(),
-            '--test-dir' => Utils\pathFromKaseProjectRoot('/tests'),
-            '--config' => Utils\pathFromKaseProjectRoot('/tests/fixtures/nonexistent-config.php')
-        ]);
+        $missingConfigPath = Utils\pathFromKaseProjectRoot('/tests/fixtures/nonexistent-config.php');
 
-        $output = $commandTester->getDisplay();
-        $expectedTestDirRealPath = realpath(__DIR__.'/..');
-        $this->assertContains("Error: Could not find specified Kase config file: {$expectedTestDirRealPath}/fixtures/nonexistent-config.php", $output);
+        $tester = $this->runCommandTest(
+            $this->createCommandSUT(),
+            ['--config' => $missingConfigPath]
+        );
+
+        $this->assertContains(
+            "Error: Could not find specified Kase config file: {$missingConfigPath}",
+            $tester->getDisplay(),
+            'Missing config file error not shown as expected'
+        );
     }
 
-    private function createCommandAndTester($kaseConfig = null)
+    protected function createCommandSUT(...$creationArgs)
     {
-        $application = new Application();
-        $application->add(new RunKaseTestsCommand($kaseConfig));
-
-        $command = $application->find('run');
-        return [$command, new CommandTester($command)];
+        return new RunKaseTestsCommand();
     }
 
     /**
@@ -43,14 +40,18 @@ class RunKaseTestsCommandTest extends TestCase
      */
     public function execute_printsErrorMessageToOutput_whenConfigAtGivenPathDoesNotReturnKVMap()
     {
-        list($command, $commandTester) = $this->createCommandAndTester();
-        $commandTester->execute([
-            'command'  => $command->getName(),
-            '--config' => Utils\pathFromKaseProjectRoot('tests/fixtures/kase-config-not-returning-kv-map.php')
-        ]);
+        $tester = $this->runCommandTest(
+            $this->createCommandSUT(),
+            [
+                '--config' => Utils\pathFromKaseProjectRoot('tests/fixtures/kase-config-not-returning-kv-map.php')
+            ]
+        );
 
-        $output = $commandTester->getDisplay();
-        $this->assertContains('Error: Specified config file does not return a key/value map', $output);
+        $this->assertContains(
+            'Error: Specified config file does not return a key/value map',
+            $tester->getDisplay(),
+            'No error shown as expected'
+        );
     }
 
     /**
@@ -58,12 +59,13 @@ class RunKaseTestsCommandTest extends TestCase
      */
     public function execute_usesResourcesDefinedInConfig_whenPathToValidConfigGiven()
     {
-        list($command, $commandTester) = $this->createCommandAndTester();
-        $commandTester->execute([
-            'command'  => $command->getName(),
-            '--config' => Utils\pathFromKaseProjectRoot('tests/fixtures/kase-config-using-method-recorders.php'),
-            '--test-dir' => Utils\pathFromKaseProjectRoot('/tests/fixtures/tests')
-        ]);
+        $tester = $this->runCommandTest(
+            $this->createCommandSUT(),
+            [
+                '--config' => Utils\pathFromKaseProjectRoot('/tests/fixtures/kase-config-using-method-recorders.php'),
+                '--test-dir' => Utils\pathFromKaseProjectRoot('/tests/fixtures/tests')
+            ]
+        );
 
         // TestUtils\MethodRecorderContainer is used within the config file specified above to define a
         // few fake resources.  See the config file specified above as well as the MethodRecorderContainer
@@ -84,12 +86,13 @@ class RunKaseTestsCommandTest extends TestCase
      */
     public function execute_includesBootstrapFile_ifBootstrapGivenInConfig()
     {
-        list($command, $commandTester) = $this->createCommandAndTester();
-        $commandTester->execute([
-            'command'  => $command->getName(),
-            '--config' => 'tests/fixtures/kase-config-defining-bootstrap.php',
-            '--test-dir' => __DIR__.'/../fixtures/tests'
-        ]);
+        $tester = $this->runCommandTest(
+            $this->createCommandSUT(),
+            [
+                '--config' => Utils\pathFromKaseProjectRoot('/tests/fixtures/kase-config-defining-bootstrap.php'),
+                '--test-dir' => Utils\pathFromKaseProjectRoot('/tests/fixtures/tests')
+            ]
+        );
 
         $this->assertTrue(defined('Kase\Test\BOOTSTRAP_INCLUDED'),
             'bootstrap file defined in the test config was not included as expected');
@@ -100,16 +103,19 @@ class RunKaseTestsCommandTest extends TestCase
      */
     public function execute_printsErrorMessageToOutput_ifBootstrapGivenInConfigButIsNotFound()
     {
-        list($command, $commandTester) = $this->createCommandAndTester();
-        $commandTester->execute([
-            'command'  => $command->getName(),
-            '--config' => 'tests/fixtures/kase-config-defining-missing-bootstrap.php',
-            '--test-dir' => __DIR__.'/../fixtures/tests'
-        ]);
+        $tester = $this->runCommandTest(
+            $this->createCommandSUT(),
+            [
+                '--config' => __DIR__.'/../fixtures/kase-config-defining-missing-bootstrap.php',
+                '--test-dir' => Utils\pathFromKaseProjectRoot('/tests/fixtures/tests')
+            ]
+        );
 
-        $expectedBootstrapPath = realpath(__DIR__.'/fixtures/kase-bootstrap-that-does-not-exist.php');
-        $output = $commandTester->getDisplay();
-        $this->assertContains("Specified bootstrap could not be found: {$expectedBootstrapPath}", $output);
+        $bootstrapPathDefinedInConfig = Utils\pathFromKaseProjectRoot('/tests/fixtures').'/kase-bootstrap-that-does-not-exist.php';
+        $this->assertContains(
+            "Specified bootstrap could not be found: {$bootstrapPathDefinedInConfig}",
+            $tester->getDisplay()
+        );
     }
 
     /**
@@ -117,13 +123,14 @@ class RunKaseTestsCommandTest extends TestCase
      */
     public function execute_usesGivenTestDirOptionToSearchForTestFiles()
     {
-        list($command, $commandTester) = $this->createCommandAndTester();
-        $commandTester->execute([
-            'command'  => $command->getName(),
-            '--test-dir' => __DIR__.'/../fixtures/tests/Bar'
-        ]);
+        $tester = $this->runCommandTest(
+            $this->createCommandSUT(),
+            [
+                '--test-dir' => Utils\pathFromKaseProjectRoot('/tests/fixtures/tests/Bar')
+            ]
+        );
 
-        $output = $commandTester->getDisplay();
+        $output = $tester->getDisplay();
         $this->assertContains('BAR TEST FILE 1 INCLUDED', $output);
         $this->assertNotContains('FOO TEST FILE 1 INCLUDED', $output);
         $this->assertNotContains('FOO TEST FILE 2 INCLUDED', $output);
@@ -134,15 +141,18 @@ class RunKaseTestsCommandTest extends TestCase
      */
     public function execute_printsErrorMessageToOutput_whenSpecifiedTestDirNotFound()
     {
-        $nonexistentDir = __DIR__.'/../fixtures/tests/NonexistentDir';
-        list($command, $commandTester) = $this->createCommandAndTester();
-        $commandTester->execute([
-            'command'  => $command->getName(),
-            '--test-dir' => $nonexistentDir
-        ]);
+        $someNonexistentDir = __DIR__.'/../fixtures/tests/NonexistentDir';
+        $tester = $this->runCommandTest(
+            $this->createCommandSUT(),
+            [
+                '--test-dir' => $someNonexistentDir
+            ]
+        );
 
-        $output = $commandTester->getDisplay();
-        $this->assertContains("Error: Could not find specified specified test directory: {$nonexistentDir}", $output);
+        $this->assertContains(
+            "Error: Could not find specified specified test directory: {$someNonexistentDir}",
+            $tester->getDisplay()
+        );
     }
 
     /**
@@ -150,14 +160,15 @@ class RunKaseTestsCommandTest extends TestCase
      */
     public function execute_usesGivenFilePatternOptionToSearchForTestFiles()
     {
-        list($command, $commandTester) = $this->createCommandAndTester();
-        $commandTester->execute([
-            'command'  => $command->getName(),
-            '--file-pattern' => '*-1.test.php',
-            '--test-dir' => __DIR__.'/../fixtures/tests'
-        ]);
+        $tester = $this->runCommandTest(
+            $this->createCommandSUT(),
+            [
+                '--file-pattern' => '*-1.test.php',
+                '--test-dir' => __DIR__.'/../fixtures/tests'
+            ]
+        );
 
-        $output = $commandTester->getDisplay();
+        $output = $tester->getDisplay();
         $this->assertContains('BAR TEST FILE 1 INCLUDED', $output);
         $this->assertContains('FOO TEST FILE 1 INCLUDED', $output);
         $this->assertNotContains('FOO TEST FILE 2 INCLUDED', $output);
@@ -168,18 +179,21 @@ class RunKaseTestsCommandTest extends TestCase
      */
     public function execute_printsErrorMessageToOutput_whenATestSuiteFileDoesNotReturnACallable()
     {
-        $testFileFixtureDir = realpath(__DIR__.'/../fixtures/tests');
+        $testFileFixtureDir = Utils\pathFromKaseProjectRoot('/tests/fixtures/tests');
         $emptyTestFileFixtureName = 'empty-test-file.php';
         $expectedAbsoluteFileFixturePath = "{$testFileFixtureDir}/{$emptyTestFileFixtureName}";
 
-        list($command, $commandTester) = $this->createCommandAndTester();
-        $commandTester->execute([
-            'command'  => $command->getName(),
-            '--test-dir' => $testFileFixtureDir,
-            '--file-pattern' => $emptyTestFileFixtureName
-        ]);
+        $tester = $this->runCommandTest(
+            $this->createCommandSUT(),
+            [
+                '--test-dir' => $testFileFixtureDir,
+                '--file-pattern' => $emptyTestFileFixtureName
+            ]
+        );
 
-        $output = $commandTester->getDisplay();
-        $this->assertContains("Error: Suite file does not return a callable test suite: {$expectedAbsoluteFileFixturePath}", $output);
+        $this->assertContains(
+            "Error: Suite file does not return a callable test suite: {$expectedAbsoluteFileFixturePath}",
+            $tester->getDisplay()
+        );
     }
 }

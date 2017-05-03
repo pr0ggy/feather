@@ -1,6 +1,6 @@
 <?php
 
-namespace Kase\Test;
+namespace Kase\Test\Reporting;
 
 use PHPUnit\Framework\TestCase;
 use Kase\Reporting\DefaultKaseCLIReporter;
