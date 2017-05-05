@@ -45,7 +45,7 @@ return runner( 'Demo Test Suite',
 
     test('Test 1 Description', function ($t) {
     	$t->failBecause('string concat failed to produce "test"')
-          ->ifNotEqual('test', 'te'.'st');
+        ->ifNotEqual('test', 'te'.'st');
     }),
 
     skip('Test 2 Description', function ($t) {
@@ -55,8 +55,8 @@ return runner( 'Demo Test Suite',
 
     only('Test 3 Description', function ($t) {
     	// This will be the only test that runs in this suite as the use of 'only' isolates it
-        $t->failBecause('failed to assert that false is false.......hmm.......')
-    	  ->if(false);
+        $t->failBecause('failed to assert that true is true.......hmm.......')
+    	   ->unless(true);
     })
 
 );
