@@ -45,7 +45,7 @@ return runner( 'Demo Test Suite',
 
     test('Test 1 Description', function ($t) {
     	$t->failBecause('string concat failed to produce "test"')
-        ->ifNotEqual('test', 'te'.'st');
+         ->ifNotEqual('test', 'te'.'st');
     }),
 
     skip('Test 2 Description', function ($t) {
