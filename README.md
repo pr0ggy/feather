@@ -147,6 +147,11 @@ The user can swap a custom validation instance into the testing resources packag
 
 The given custom validation callbacks will be scope bound to a created Validator instance returned from the ValidatorFactory before execution, so you may access other validation methods within the custom callback.  Note that it is only necessary to create a new `Kase\Validation\ValidatorFactory` instance if you wish to use custom assertion methods...if not, a default instance will be created within the Kase runner that supports the [basic assertion methods](#basic_assertions) outlined above.
 
+## Calling Assertion Methods on Validator Instances
+Note that the default validation methods all contain the 'fail' prefix...this can actually be omitted
+when calling them, as shown in the example test suite file.  The same applies to custom validation
+methods.
+
 ## Testing Kase
 	./vendor/bin/phpunit
 
