@@ -6,6 +6,7 @@ use SebastianBergmann\Comparator;
 use Symfony\Component\Console\Output\OutputInterface;
 use Kase\Validation\ValidationFailureException;
 use const Kase\VERSION;
+use Exception;
 
 /**
  * Built-in simple CLI reporter for the Kase testing framework
@@ -128,9 +129,9 @@ class DefaultKaseCLIReporter implements Reporter
      * Writes information about a failed test to the reporter's OutputInterface dependency
      *
      * @param  string                     $testDescription the description of the failed test
-     * @param  ValidationFailureException $exception       the validation exception resulting in the failure
+     * @param  Exception $exception       the validation exception resulting in the failure
      */
-    public function registerFailedTest($testDescription, ValidationFailureException $exception)
+    public function registerFailedTest($testDescription, Exception $exception)
     {
         $this->writeLineToOutput(
             $this->inErrorFormat("[FAIL] {$testDescription}")
@@ -143,21 +144,22 @@ class DefaultKaseCLIReporter implements Reporter
      * The details may include a simple failure message specified in the test, or the failure message
      * along with a diff printout of actual/expected values.
      *
-     * @param  ValidationFailureException $exception the validation exception resulting in the failure
+     * @param  Exception $exception the validation exception resulting in the failure
      */
-    protected function outputTestFailureDetails(ValidationFailureException $exception)
+    protected function outputTestFailureDetails(Exception $exception)
     {
         $this->writeToOutput(
             $this->inErrorFormat($exception->getMessage())
         );
 
-        $expectedValue = $exception->getExpectedValue();
-        if (is_null($expectedValue)) {
+        if (property_exists($exception, 'data') === false
+            || array_key_exists('expectedValue', $exception->data) === false) {
             $this->writeBlankLineToOutput();
             return;
         }
 
-        $actualValue = $exception->getActualValue();
+        $expectedValue = $exception->data['expectedValue'];
+        $actualValue = $exception->data['actualValue'];
         $comparator = $this->comparatorFactory->getComparatorFor($expectedValue, $actualValue);
         try {
             $comparator->assertEquals($expectedValue, $actualValue);
@@ -175,19 +177,6 @@ class DefaultKaseCLIReporter implements Reporter
     protected function inErrorFormat($text)
     {
         return "<error>{$text}</error>";
-    }
-
-    /**
-     * Writes details of any unexpected exception encountered when executing a test to the reporter's
-     * OutputInterface instance
-     *
-     * @param  \Exception $exception the encountered exception
-     */
-    public function registerUnexpectedException(\Exception $exception)
-    {
-        $this->writeLineToOutput(
-            $this->inErrorFormat("[FAIL] Unexpected {$exception}")
-        );
     }
 
     /**

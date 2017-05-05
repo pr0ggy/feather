@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Equip\Structure\Dictionary;
 use function Nark\createSpyInstanceOf;
 use function Nark\occurredChronologically;
-use Kase\Validation\ValidationFailureException;
+use Exception;
 use const Kase\TEST_MODE_NORMAL;
 use const Kase\TEST_MODE_SKIPPED;
 use const Kase\TEST_MODE_ISOLATED;
@@ -133,7 +133,7 @@ class FunctionsTest extends TestCase
     private function createFakeTestingResources($overrides = [])
     {
         return [
-            'validator'     => (isset($overrides['validator']) ? $overrides['validator'] : createSpyInstanceOf('\Kase\Validation\TestValidator')),
+            'validator'     => (isset($overrides['validator']) ? $overrides['validator'] : createSpyInstanceOf('\Kase\Validation\ValidatorFactory')),
             'reporter'      => (isset($overrides['reporter']) ? $overrides['reporter'] : createSpyInstanceOf('\Kase\Reporting\Reporter')),
             'metricsLogger' => (isset($overrides['metricsLogger']) ? $overrides['metricsLogger'] : function($metrics) {/*no-op*/})
         ];
@@ -163,7 +163,7 @@ class FunctionsTest extends TestCase
     /**
      * @test
      */
-    public function runnerFunction_runsAllTestsUtilizingTestValidatorInstanceFromContext_whenNoIsolatedOrSkippedTests()
+    public function runnerFunction_runsAllTestsUtilizingValidatorInstanceFromContext_whenNoIsolatedOrSkippedTests()
     {
         $fakeTestingResources = $this->createFakeTestingResources();
         $fakeValidator = $fakeTestingResources['validator'];
@@ -179,13 +179,13 @@ class FunctionsTest extends TestCase
         $validatorSpy = $fakeValidator->reflector();
         $expectedValidations = count($suiteTests);
         $this->assertEquals($expectedValidations, count($validatorSpy->pass()),
-            "failed to validate {$expectedValidations} times against the TestValidator instance specified in the Context");
+            "failed to validate {$expectedValidations} times against the validator instance specified in the Context");
     }
 
     /**
      * @test
      */
-    public function runnerFunction_runsOnlyIsolatedTestsUtilizingTestValidatorInstanceFromContext_whenOneTestIsSpecifiedAsIsolated()
+    public function runnerFunction_runsOnlyIsolatedTestsUtilizingValidatorInstanceFromContext_whenOneTestIsSpecifiedAsIsolated()
     {
         $fakeTestingResources = $this->createFakeTestingResources();
         $fakeValidator = $fakeTestingResources['validator'];
@@ -202,7 +202,7 @@ class FunctionsTest extends TestCase
 
         $validatorSpy = $fakeValidator->reflector();
         $this->assertEquals(1, count($validatorSpy->pass()),
-            'failed to validate once against the TestValidator instance specified in the Context');
+            'failed to validate once against the validator instance specified in the Context');
     }
 
     /**
@@ -226,7 +226,7 @@ class FunctionsTest extends TestCase
         $nonSkippedTestCount = 2;
         $validatorSpy = $fakeValidator->reflector();
         $this->assertEquals($nonSkippedTestCount, count($validatorSpy->pass()),
-            "failed to validate {$nonSkippedTestCount} times against the TestValidator instance specified in the Context");
+            "failed to validate {$nonSkippedTestCount} times against the validator instance specified in the Context");
     }
 
     /**
@@ -234,9 +234,9 @@ class FunctionsTest extends TestCase
      */
     public function runnerFunction_registersTestResultsProperlyWithSuiteReporterInstanceFromContext()
     {
-        $someTestValidationFailureException = new ValidationFailureException('some validation failure message');
+        $someTestValidationFailureException = new Exception('some validation failure message');
         $fakeTestingResources = $this->createFakeTestingResources([
-            'validator' => createSpyInstanceOf('\Kase\Validation\TestValidator', [
+            'validator' => createSpyInstanceOf('\Kase\Validation\ValidatorFactory', [
                 'fail' => \nark\throwsException($someTestValidationFailureException)
             ])
         ]);
@@ -262,34 +262,12 @@ class FunctionsTest extends TestCase
     /**
      * @test
      */
-    public function runnerFunction_registersAnyUnexpectedExceptionWithSuiteReporterInstanceFromContext()
-    {
-        $fakeTestingResources = $this->createFakeTestingResources();
-        $fakeReporter = $fakeTestingResources['reporter'];
-        $someUnexpectedException = new \RuntimeException('some runtime exception');
-        $suiteTests = [
-            test('Successful Test', function ($t) { $t->pass(); }),
-            skip('Skipped Test', function ($t) { /* no-op */ }),
-            test('Test Throwing Unexpected Exception', function ($t) use ($someUnexpectedException) { throw $someUnexpectedException; })
-        ];
-
-        $sut = runner('some suite description', ...$suiteTests);
-        $sut($fakeTestingResources);
-
-        $reporterSpy = $fakeReporter->reflector();
-        $this->assertEquals(1, count($reporterSpy->registerUnexpectedException($someUnexpectedException)),
-            "failed to register unexpected exception with the SuiteReporter instance specified in the Context");
-    }
-
-    /**
-     * @test
-     */
     public function runnerFunction_registersAccurateSuiteMetricsPackageWithContextInstance()
     {
-        $someTestValidationFailureException = new ValidationFailureException('some validation failure message');
+        $someTestValidationFailureException = new Exception('some validation failure message');
         $testCaseMetricsLog = [];
         $fakeTestingResources = $this->createFakeTestingResources([
-            'validator' => createSpyInstanceOf('\Kase\Validation\TestValidator', [
+            'validator' => createSpyInstanceOf('\Kase\Validation\ValidatorFactory', [
                 'fail' => \nark\throwsException($someTestValidationFailureException)
             ]),
             'metricsLogger' => function ($metricsToLog) use (&$testCaseMetricsLog) { $testCaseMetricsLog[] = $metricsToLog; }
@@ -315,7 +293,7 @@ class FunctionsTest extends TestCase
             'skippedTests' => ['Skipped Test']
         ];
         $actualRecordedSuiteAMetrics = $testCaseMetricsLog[0];
-        $expectedSuiteAMetricsMatcher = $this->generateHamcrestKVMatcherFromMap($expectedRecordedSuiteAMetrics);
+        $expectedSuiteAMetricsMatcher = $this->generateHamcrestKVMatcherFromDict($expectedRecordedSuiteAMetrics);
         $this->assertTrue($expectedSuiteAMetricsMatcher->matches($actualRecordedSuiteAMetrics),
             'recorded suite A metrics did not match the expected metrics');
 
@@ -338,19 +316,19 @@ class FunctionsTest extends TestCase
             'skippedTests' => ['Skipped Test', 'Skipped Test 2']
         ];
         $actualRecordedSuiteBMetrics = $testCaseMetricsLog[1];
-        $expectedSuiteBMetricsMatcher = $this->generateHamcrestKVMatcherFromMap($expectedRecordedSuiteBMetrics);
+        $expectedSuiteBMetricsMatcher = $this->generateHamcrestKVMatcherFromDict($expectedRecordedSuiteBMetrics);
         $this->assertTrue($expectedSuiteBMetricsMatcher->matches($actualRecordedSuiteBMetrics),
             'recorded suite B metrics did not match the expected metrics');
     }
 
-    protected function generateHamcrestKVMatcherFromMap(array $map)
+    protected function generateHamcrestKVMatcherFromDict(array $dict)
     {
         $matchers = array_map(
             function ($k, $v) {
                 return \Hamcrest\Matchers::hasKeyValuePair($k, $v);
             },
-            array_keys($map),
-            array_values($map)
+            array_keys($dict),
+            array_values($dict)
         );
 
         return \Hamcrest\Matchers::allOf(...$matchers);
@@ -396,8 +374,8 @@ class FunctionsTest extends TestCase
         ];
 
         $reporterSpy = $fakeReporter->reflector();
-        $expectedSuiteAMetricsMatcher = $this->generateHamcrestKVMatcherFromMap($expectedRecordedSuiteAMetrics);
-        $expectedSuiteBMetricsMatcher = $this->generateHamcrestKVMatcherFromMap($expectedRecordedSuiteBMetrics);
+        $expectedSuiteAMetricsMatcher = $this->generateHamcrestKVMatcherFromDict($expectedRecordedSuiteAMetrics);
+        $expectedSuiteBMetricsMatcher = $this->generateHamcrestKVMatcherFromDict($expectedRecordedSuiteBMetrics);
         $this->assertTrue(occurredChronologically(
             $reporterSpy->registerSuiteExecutionCompletion($suiteADescription, $expectedSuiteAMetricsMatcher),
             $reporterSpy->registerSuiteExecutionCompletion($suiteBDescription, $expectedSuiteBMetricsMatcher)

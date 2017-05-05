@@ -44,8 +44,8 @@ use function Kase\only;
 return runner( 'Demo Test Suite',
 
     test('Test 1 Description', function ($t) {
-    	$t->assertEqual('test', 'te'.'st',
-    		'string concat failed to produce "test"');
+    	$t->failBecause('string concat failed to produce "test"')
+          ->ifNotEqual('test', 'te'.'st');
     }),
 
     skip('Test 2 Description', function ($t) {
@@ -55,7 +55,8 @@ return runner( 'Demo Test Suite',
 
     only('Test 3 Description', function ($t) {
     	// This will be the only test that runs in this suite as the use of 'only' isolates it
-    	$t->assert(true, 'failed to assert that true is true.......hmm.......');
+        $t->failBecause('failed to assert that false is false.......hmm.......')
+    	  ->if(false);
     })
 
 );
@@ -90,47 +91,61 @@ function Kase\only($description, callable $testDefinition)
 Creates a test case which will run in isolation (ie. all other test cases will be skipped).  Only one test per suite may be run in isolation at a given time or an error will be thrown.
 
 ## <a name="basic_assertions"></a>Assertion API
-*The built-in validation class passed to each  test case definition supports the following validation methods out-of-the-box:*
+*The built-in ValidatorFactory and Validator instances utilized in each  test case definition by default supports the following validation methods out-of-the-box...see the example test suite *
 
 ```
-TestValidator::pass()
+ValidatorFactory::pass()
 ```
-The validator object throws exceptions to indicate errors found during execution of a test case definition.  This function doesn't actually do anything--it's a readability function.
-
----
-
-```
-TestValidator::fail($message = 'Test explicitly failed (This message should ideally be more descriptive...)')
-```
-Explicitly fails the test case with the given message
+A created validator object throws exceptions to indicate errors found during execution of a test case definition.  A passed test is, by definition, one that doesn't result in a thrown exception.  So, this function doesn't actually do anything--it's a readability function.
 
 ---
 
 ```
-TestValidator::assert($value, $message = 'Failed to assert that the given value was true')
+ValidatorFactory::fail($message = 'Test explicitly failed (This message should ideally be more descriptive...)')
 ```
-Asserts that the given value is truthy, or fails the test case with the given message
+Explicitly fails the test case with the given message by throwing an exception immediately
 
 ---
 
 ```
-TestValidator::assertEqual($expectedValue, $actualValue, $message = 'Failed to assert that the given values were equal (==)')
+ValidatorFactory::failBecause($onFailureMessage)
 ```
-Asserts that the expected value matches the actual value using loose (==) equality, or fails the test case with the given message
+Creates and returns a new Validator object that will fail with the given message if any validation methods called on it fail
 
 ---
 
 ```
-TestValidator::assertSame($expectedValue, $actualValue, $message = 'Failed to assert that the given values were equal (===)')
+Validator::failUnless($valueThatPassesValidationIfTrue)
 ```
-Asserts that the expected value matches the actual value using strict (===) equality, or fails the test case with the given message
+Asserts that the given value is truthy, or throws the Validator instance itself
+
+---
+
+```
+Validator::failIf($valueThatPassesValidationIfFalse)
+```
+Asserts that the given value is not truthy, or throws the Validator instance itself
+
+---
+
+```
+Validator::failIfNotEqual($expectedValue, $actualValue)
+```
+Asserts that the expected value matches the actual value using loose (==) equality, or throws the Validator instance itself
+
+---
+
+```
+Validator::failIfNotSame($expectedValue, $actualValue)
+```
+Asserts that the expected value matches the actual value using strict (===) equality, or throws the Validator instance itself
 
 ## Custom Assertion Methods
-The user can swap a new `Kase\TestValidator` instance (or any other class instance, for that matter) into the testing resources package to assert against it within test cases (see the example config file in the `example` folder of the repo for details on how this is accomplished).  The `Kase\TestValidator` constructor accepts a dictionary of custom assertion callbacks in the format:
+The user can swap a custom validation instance into the testing resources package to assert against it within test cases (see the example config file in the `example` folder of the repo for details on how this is accomplished).  The `Kase\Validation\ValidatorFactory` constructor accepts a dictionary of custom assertion callbacks in the format:
 
 	<validation method name> => <validation callback>
 
-The given custom validation callbacks will be scope bound to the validator instance itself before execution, so you may access other validation methods within the custom callback using standard `$this->assert(...)` calls.  Note that it is only necessary to create a new `Kase\TestValidator` instance if you wish to use custom assertion methods...if not, a default instance will be created within the Kase runner that supports the [basic assertion methods](#basic_assertions) outlined above.
+The given custom validation callbacks will be scope bound to a created Validator instance returned from the ValidatorFactory before execution, so you may access other validation methods within the custom callback.  Note that it is only necessary to create a new `Kase\Validation\ValidatorFactory` instance if you wish to use custom assertion methods...if not, a default instance will be created within the Kase runner that supports the [basic assertion methods](#basic_assertions) outlined above.
 
 ## Testing Kase
 	./vendor/bin/phpunit

@@ -38,17 +38,17 @@ class RunKaseTestsCommandTest extends Base\KaseCommandTestCase
     /**
      * @test
      */
-    public function execute_printsErrorMessageToOutput_whenConfigAtGivenPathDoesNotReturnKVMap()
+    public function execute_printsErrorMessageToOutput_whenConfigAtGivenPathDoesNotReturnKVDict()
     {
         $tester = $this->runCommandTest(
             $this->createCommandSUT(),
             [
-                '--config' => Utils\pathFromKaseProjectRoot('tests/fixtures/kase-config-not-returning-kv-map.php')
+                '--config' => Utils\pathFromKaseProjectRoot('tests/fixtures/kase-config-not-returning-kv-dict.php')
             ]
         );
 
         $this->assertContains(
-            'Error: Specified config file does not return a key/value map',
+            'Error: Specified config file does not return a key/value dictionary',
             $tester->getDisplay(),
             'No error shown as expected'
         );

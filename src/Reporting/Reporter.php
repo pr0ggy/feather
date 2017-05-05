@@ -2,7 +2,7 @@
 
 namespace Kase\Reporting;
 
-use Kase\Validation\ValidationFailureException;
+use Exception;
 
 /**
  * Interface defining methods which are used by the test runner to report on testing events
@@ -41,16 +41,9 @@ interface Reporter
      * Called by the test runner to register a test that failed validation
      *
      * @param  string                     $testDescription
-     * @param  ValidationFailureException $exception the validation exception resulting in the failure
+     * @param  Exception $exception the validation exception resulting in the failure
      */
-    public function registerFailedTest($testDescription, ValidationFailureException $exception);
-
-    /**
-     * Called by the test runner to register an unexpected exception encountered during test execution
-     *
-     * @param  \Exception $exception
-     */
-    public function registerUnexpectedException(\Exception $exception);
+    public function registerFailedTest($testDescription, Exception $exception);
 
     /**
      * Called by the test runner just after running all the tests within a suite

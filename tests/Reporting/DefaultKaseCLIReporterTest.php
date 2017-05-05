@@ -5,6 +5,7 @@ namespace Kase\Test\Reporting;
 use PHPUnit\Framework\TestCase;
 use Kase\Reporting\DefaultKaseCLIReporter;
 use Kase\Validation\ValidationFailureException;
+use Exception;
 use function Nark\occurredSequentially;
 use const Kase\VERSION;
 
@@ -106,7 +107,7 @@ class DefaultKaseCLIReporterTest extends TestCase
         $sut = new DefaultKaseCLIReporter($fakeOutput);
         $someTestDescription = 'some test description';
         $someValidationFailureMessage = 'this is why it failed';
-        $someValidationException = new ValidationFailureException($someValidationFailureMessage);
+        $someValidationException = new Exception($someValidationFailureMessage);
 
         $sut->registerFailedTest($someTestDescription, $someValidationException);
 
@@ -129,11 +130,11 @@ class DefaultKaseCLIReporterTest extends TestCase
         $someValidationFailureMessage = 'this is why it failed';
         $someExpectedValue = [true];
         $someActualValue = [false];
-        $someValidationException = new ValidationFailureException(
-            $someValidationFailureMessage,
-            $someExpectedValue,
-            $someActualValue
-        );
+        $someValidationException = new Exception($someValidationFailureMessage);
+        $someValidationException->data = [
+            'expectedValue' => $someExpectedValue,
+            'actualValue' => $someActualValue
+        ];
 
         $sut->registerFailedTest($someTestDescription, $someValidationException);
 
@@ -143,23 +144,6 @@ class DefaultKaseCLIReporterTest extends TestCase
             $outputSpy->writeln("<error>[FAIL] {$someTestDescription}</error>"),
             'reporter did not print the failed test info to the output interface as expected'
         );
-    }
-
-    /**
-     * @test
-     */
-    public function registerUnexpectedException_reportsDetailsOnAnUnexpectedException()
-    {
-        $fakeOutput = $this->getOutputInterfaceSpy();
-        $sut = new DefaultKaseCLIReporter($fakeOutput);
-        $someUnexpectedException = new \Exception('something unexpected happened');
-
-        $sut->registerUnexpectedException($someUnexpectedException);
-
-        $outputSpy = $fakeOutput->reflector();
-        $this->assertTrue(occurredSequentially(
-            $outputSpy->writeln("<error>[FAIL] Unexpected {$someUnexpectedException}</error>")
-        ), 'reporter did not print the unexpected exception message to the output interface as expected');
     }
 
     /**
@@ -175,7 +159,7 @@ class DefaultKaseCLIReporterTest extends TestCase
             'executionEndTime' => 3.52,
             'passedTestCount' => 20,
             'failedTests' => [
-                'failed test 1' => new \Exception()
+                'failed test 1' => new Exception()
             ],
             'skippedTests' => [
                 'skipped test 1',
@@ -231,16 +215,16 @@ class DefaultKaseCLIReporterTest extends TestCase
         $fakeOutput = $this->getOutputInterfaceSpy();
         $sut = new DefaultKaseCLIReporter($fakeOutput);
         $someValidationFailureMessage = 'something went wrong';
-        $someValidationException = new ValidationFailureException($someValidationFailureMessage);
+        $someValidationException = new Exception($someValidationFailureMessage);
 
         $anotherValidationFailureMessage = 'something went wrong again';
         $someExpectedValue = [true];
         $someActualValue = [false];
-        $anotherValidationException = new ValidationFailureException(
-            $anotherValidationFailureMessage,
-            $someExpectedValue,
-            $someActualValue
-        );
+        $anotherValidationException = new Exception($anotherValidationFailureMessage);
+        $anotherValidationException->data = [
+            'expectedValue' => $someExpectedValue,
+            'actualValue' => $someActualValue
+        ];
 
         $suiteMetricsList = [
             // some suite A

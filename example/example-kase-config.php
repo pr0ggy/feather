@@ -20,24 +20,24 @@ return [
      * TYPE: any
      *
      * This is the validation object that will be passed into each test case definition and
-     * used to make assertions within the test case.  Kase ships with a TestValidator
-     * class which supports basic assertion methods and is also customizable by passing a
-     * dictionary of <custom_assertion_method_name> => <custom_assertion_method_callback>
-     * to the constructor.  If you wish to replace this validation class with a custom class,
-     * feel free; you write the test cases, so you decide how the validator will be used and
-     * can write your tests to suite any validator you choose.  The only requirement is that
-     * validation failures throw instances of Kase\ValidationFailureException.  An example of
-     * overriding the testing resources with a Kase\TestValidator instance loaded with custom
-     * validation methods can be found in the example below.
+     * used to make assertions within the test case.  Kase ships with ValidatorFactory/Validator
+     * classes which support basic assertion methods and are also customizable by passing a
+     * dictionary of the format <custom_assertion_method_name> => <custom_assertion_method_callback>
+     * to the constructor of the ValidatorFactory. Each custom validation method only needs to 'throw
+     * $this' if validation fails as the custom function will be scope-bound to the validator object
+     * that is utilizing it. If you wish to replace this system with a custom system, feel free; you
+     * write the test cases, so you decide how the validation system will be used and can write your
+     * tests to suite any validator you choose, as long as the validation system throws exceptions
+     * on failure.
      */
-    'validator' => new Kase\Validation\TestValidator([
-        'assertEvenInteger' =>
-            function ($value, $message = 'Failed to assert that the given value was an even integer') {
+    'validator' => new Kase\Validation\ValidatorFactory([
+        'isNotEvenInteger' =>
+            function ($value) {
                 if (is_int($value) && ($value % 2) === 0) {
                     return;
                 }
 
-                throw new ValidationFailureException($message);
+                throw $this;
             }
     ])
 
