@@ -221,10 +221,6 @@ class DefaultKaseCLIReporterTest extends TestCase
         $someExpectedValue = [true];
         $someActualValue = [false];
         $anotherValidationException = new Exception($anotherValidationFailureMessage);
-        $anotherValidationException->data = [
-            'expectedValue' => $someExpectedValue,
-            'actualValue' => $someActualValue
-        ];
 
         $suiteMetricsList = [
             // some suite A
@@ -279,17 +275,7 @@ class DefaultKaseCLIReporterTest extends TestCase
                 $outputSpy->writeln(''),
                 $outputSpy->writeln(''),
                 $outputSpy->writeln('<error>[FAIL] failed test 2</error>'),
-                $outputSpy->write("<error>{$anotherValidationFailureMessage}</error>"),
-                $outputSpy->writeln(
-"<error>
---- Expected
-+++ Actual
-@@ @@
- Array (
--    0 => true
-+    0 => false
- )
-</error>")
+                $outputSpy->write("<error>{$anotherValidationFailureMessage}</error>")
             ),
             'reporter did not print the overall suite execution summary as expected'
         );

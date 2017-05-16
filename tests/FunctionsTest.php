@@ -133,7 +133,6 @@ class FunctionsTest extends TestCase
     private function createFakeTestingResources($overrides = [])
     {
         return [
-            'validator'     => (isset($overrides['validator']) ? $overrides['validator'] : createSpyInstanceOf('\Kase\Validation\ValidatorFactory')),
             'reporter'      => (isset($overrides['reporter']) ? $overrides['reporter'] : createSpyInstanceOf('\Kase\Reporting\Reporter')),
             'metricsLogger' => (isset($overrides['metricsLogger']) ? $overrides['metricsLogger'] : function($metrics) {/*no-op*/})
         ];
@@ -163,46 +162,41 @@ class FunctionsTest extends TestCase
     /**
      * @test
      */
-    public function runnerFunction_runsAllTestsUtilizingValidatorInstanceFromContext_whenNoIsolatedOrSkippedTests()
+    public function runnerFunction_runsAllTests_whenNoIsolatedOrSkippedTests()
     {
-        $fakeTestingResources = $this->createFakeTestingResources();
-        $fakeValidator = $fakeTestingResources['validator'];
+        $executedTests = [];
         $suiteTests = [
-            test('Test A', function ($t) { $t->pass(); }),
-            test('Test B', function ($t) { $t->pass(); }),
-            test('Test C', function ($t) { $t->pass(); })
+            test('Test A', function () use (&$executedTests) { $executedTests[] = 'Test A'; }),
+            test('Test B', function () use (&$executedTests) { $executedTests[] = 'Test B'; }),
+            test('Test C', function () use (&$executedTests) { $executedTests[] = 'Test C'; })
         ];
+        $expectedExecutedTests = ['Test A', 'Test B', 'Test C'];
 
         $sut = runner('some suite description', ...$suiteTests);
-        $sut($fakeTestingResources);
+        $sut($this->createFakeTestingResources());
 
-        $validatorSpy = $fakeValidator->reflector();
-        $expectedValidations = count($suiteTests);
-        $this->assertEquals($expectedValidations, count($validatorSpy->pass()),
-            "failed to validate {$expectedValidations} times against the validator instance specified in the Context");
+        $this->assertEquals($expectedExecutedTests, $executedTests,
+            "failed to run the tests as expected");
     }
 
     /**
      * @test
      */
-    public function runnerFunction_runsOnlyIsolatedTestsUtilizingValidatorInstanceFromContext_whenOneTestIsSpecifiedAsIsolated()
+    public function runnerFunction_runsOnlyIsolatedTests_whenOneTestIsSpecifiedAsIsolated()
     {
-        $fakeTestingResources = $this->createFakeTestingResources();
-        $fakeValidator = $fakeTestingResources['validator'];
-        $phpunit = $this;
-        $failTheTest = function () use ($phpunit) { $phpunit->fail('Ran non-isolated test definition even though an isolated test was specified'); };
+        $executedTests = [];
         $suiteTests = [
-            test('Test A', function ($t) use ($failTheTest) { $failTheTest(); }),
-            only('Test B', function ($t) { $t->pass(); }),
-            test('Test C', function ($t) use ($failTheTest) { $failTheTest(); })
+            test('Test A', function () use (&$executedTests) { $executedTests[] = 'Test A'; }),
+            only('Test B', function () use (&$executedTests) { $executedTests[] = 'Test B'; }),
+            test('Test C', function () use (&$executedTests) { $executedTests[] = 'Test C'; }),
         ];
+        $expectedExecutedTests = ['Test B'];
 
         $sut = runner('some suite description', ...$suiteTests);
-        $sut($fakeTestingResources);
+        $sut($this->createFakeTestingResources());
 
-        $validatorSpy = $fakeValidator->reflector();
-        $this->assertEquals(1, count($validatorSpy->pass()),
-            'failed to validate once against the validator instance specified in the Context');
+        $this->assertEquals($expectedExecutedTests, $executedTests,
+            "failed to run the tests as expected");
     }
 
     /**
@@ -210,23 +204,19 @@ class FunctionsTest extends TestCase
      */
     public function runnerFunction_doesNotRunSkippedTests()
     {
-        $fakeTestingResources = $this->createFakeTestingResources();
-        $fakeValidator = $fakeTestingResources['validator'];
-        $phpunit = $this;
-        $failTheTest = function () use ($phpunit) { $phpunit->fail('Ran test definition even though that test was marked as skipped'); };
+        $executedTests = [];
         $suiteTests = [
-            test('Test A', function ($t) { $t->pass(); }),
-            skip('Test B', function ($t) use ($failTheTest) { $failTheTest(); }),
-            test('Test C', function ($t) { $t->pass(); })
+            test('Test A', function () use (&$executedTests) { $executedTests[] = 'Test A'; }),
+            skip('Test B', function () use (&$executedTests) { $executedTests[] = 'Test B'; }),
+            test('Test C', function () use (&$executedTests) { $executedTests[] = 'Test C'; })
         ];
+        $expectedExecutedTests = ['Test A', 'Test C'];
 
         $sut = runner('some suite description', ...$suiteTests);
-        $sut($fakeTestingResources);
+        $sut($this->createFakeTestingResources());
 
-        $nonSkippedTestCount = 2;
-        $validatorSpy = $fakeValidator->reflector();
-        $this->assertEquals($nonSkippedTestCount, count($validatorSpy->pass()),
-            "failed to validate {$nonSkippedTestCount} times against the validator instance specified in the Context");
+        $this->assertEquals($expectedExecutedTests, $executedTests,
+            "failed to skip the expected test");
     }
 
     /**
@@ -234,17 +224,13 @@ class FunctionsTest extends TestCase
      */
     public function runnerFunction_registersTestResultsProperlyWithSuiteReporterInstanceFromContext()
     {
-        $someTestValidationFailureException = new Exception('some validation failure message');
-        $fakeTestingResources = $this->createFakeTestingResources([
-            'validator' => createSpyInstanceOf('\Kase\Validation\ValidatorFactory', [
-                'fail' => \nark\throwsException($someTestValidationFailureException)
-            ])
-        ]);
+        $fakeTestingResources = $this->createFakeTestingResources();
         $fakeReporter = $fakeTestingResources['reporter'];
+        $someTestValidationFailureException = new Exception('some test failure message');
         $suiteTests = [
-            test('Successful Test', function ($t) { $t->pass(); }),
-            skip('Skipped Test', function ($t) { /* no-op */ }),
-            test('Failing Test', function ($t) { $t->fail('some test failure message'); })
+            test('Successful Test', function () { /* no-op */ }),
+            skip('Skipped Test', function () { /* no-op */ }),
+            test('Failing Test', function () use ($someTestValidationFailureException) { throw $someTestValidationFailureException; })
         ];
 
         $sut = runner('some suite description', ...$suiteTests);
@@ -264,22 +250,19 @@ class FunctionsTest extends TestCase
      */
     public function runnerFunction_registersAccurateSuiteMetricsPackageWithContextInstance()
     {
-        $someTestValidationFailureException = new Exception('some validation failure message');
         $testCaseMetricsLog = [];
         $fakeTestingResources = $this->createFakeTestingResources([
-            'validator' => createSpyInstanceOf('\Kase\Validation\ValidatorFactory', [
-                'fail' => \nark\throwsException($someTestValidationFailureException)
-            ]),
             'metricsLogger' => function ($metricsToLog) use (&$testCaseMetricsLog) { $testCaseMetricsLog[] = $metricsToLog; }
         ]);
 
 
         // SOME TEST SUITE A
         $suiteADescription = 'Test Suite A';
+        $someTestValidationFailureException = new Exception('some test failure message');
         $suiteATests = [
-            test('Successful Test', function ($t) { $t->pass(); }),
-            skip('Skipped Test', function ($t) { /* no-op */ }),
-            test('Failing Test', function ($t) { $t->fail('some test failure message'); })
+            test('Successful Test', function () { /* no-op */ }),
+            skip('Skipped Test', function () { /* no-op */ }),
+            test('Failing Test', function () use ($someTestValidationFailureException) { throw $someTestValidationFailureException; })
         ];
         $sut = runner($suiteADescription, ...$suiteATests);
         $sut($fakeTestingResources);
@@ -300,9 +283,9 @@ class FunctionsTest extends TestCase
         // SOME TEST SUITE B
         $suiteBDescription = 'Test Suite B';
         $suiteBTests = [
-            test('Successful Test', function ($t) { $t->pass(); }),
-            skip('Skipped Test', function ($t) { /* no-op */ }),
-            skip('Skipped Test 2', function ($t) { /* no-op */ })
+            test('Successful Test', function () { /* no-op */ }),
+            skip('Skipped Test', function () { /* no-op */ }),
+            skip('Skipped Test 2', function () { /* no-op */ })
         ];
         $sut = runner($suiteBDescription, ...$suiteBTests);
         $sut($fakeTestingResources);
@@ -345,7 +328,7 @@ class FunctionsTest extends TestCase
         // SOME TEST SUITE A
         $suiteADescription = 'Test Suite A';
         $suiteATests = [
-            test('Successful Test', function ($t) { $t->pass(); }),
+            test('Successful Test', function () { /*no-op*/ }),
         ];
         $sut = runner($suiteADescription, ...$suiteATests);
         $sut($fakeTestingResources);
@@ -359,9 +342,9 @@ class FunctionsTest extends TestCase
         // SOME TEST SUITE B
         $suiteBDescription = 'Test Suite B';
         $suiteBTests = [
-            test('Successful Test', function ($t) { $t->pass(); }),
-            skip('Skipped Test', function ($t) { /*no-op*/ }),
-            skip('Skipped Test 2', function ($t) { /*no-op*/ })
+            test('Successful Test', function () { /*no-op*/ }),
+            skip('Skipped Test', function () { /*no-op*/ }),
+            skip('Skipped Test 2', function () { /*no-op*/ })
 
         ];
         $sut = runner($suiteBDescription, ...$suiteBTests);

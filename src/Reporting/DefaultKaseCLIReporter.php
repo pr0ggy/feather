@@ -141,9 +141,6 @@ class DefaultKaseCLIReporter implements Reporter
     /**
      * Writes details about a validation exception resulting in a test failure
      *
-     * The details may include a simple failure message specified in the test, or the failure message
-     * along with a diff printout of actual/expected values.
-     *
      * @param  Exception $exception the validation exception resulting in the failure
      */
     protected function outputTestFailureDetails(Exception $exception)
@@ -151,23 +148,7 @@ class DefaultKaseCLIReporter implements Reporter
         $this->writeToOutput(
             $this->inErrorFormat($exception->getMessage())
         );
-
-        if (property_exists($exception, 'data') === false
-            || array_key_exists('expectedValue', $exception->data) === false) {
-            $this->writeBlankLineToOutput();
-            return;
-        }
-
-        $expectedValue = $exception->data['expectedValue'];
-        $actualValue = $exception->data['actualValue'];
-        $comparator = $this->comparatorFactory->getComparatorFor($expectedValue, $actualValue);
-        try {
-            $comparator->assertEquals($expectedValue, $actualValue);
-        } catch (Comparator\ComparisonFailure $failure) {
-            $this->writeLineToOutput(
-                $this->inErrorFormat($failure->getDiff())
-            );
-        }
+        $this->writeBlankLineToOutput();
     }
 
     /**

@@ -22,7 +22,6 @@ use RuntimeException;
 function runner($suiteDescription, ...$suiteTests)
 {
     return function ($testingResources) use ($suiteDescription, $suiteTests) {
-        $testValidator = $testingResources['validator'];
         $testReporter = $testingResources['reporter'];
         $metricsLogger = $testingResources['metricsLogger'];
 
@@ -61,7 +60,7 @@ function runner($suiteDescription, ...$suiteTests)
                 }
 
                 $testDefinition = $test['definition'];
-                $testDefinition($testValidator);
+                $testDefinition();
                 ++$suiteMetrics['passedTestCount'];
                 $testReporter->registerPassedTest($test['description']);
             } catch (Exception $exception) {

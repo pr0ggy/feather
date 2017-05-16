@@ -83,7 +83,6 @@ class RunKaseTestsCommand extends Command
         // ----- SET UP TESTING RESOURCES ----------------------------------------------------------
         $metricsLog = [];
         $testingResources = [
-            'validator'     => (isset($config['validator']) ? $config['validator'] : new Validation\ValidatorFactory()),
             'reporter'      => (isset($config['reporter']) ? $config['reporter'] : new Reporting\DefaultKaseCLIReporter($output)),
             'metricsLogger' => function ($metricsToRecord) use (&$metricsLog) {
                 $metricsLog[] = $metricsToRecord;

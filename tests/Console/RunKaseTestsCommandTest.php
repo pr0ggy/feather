@@ -71,10 +71,7 @@ class RunKaseTestsCommandTest extends Base\KaseCommandTestCase
         // few fake resources.  See the config file specified above as well as the MethodRecorderContainer
         // class to understand what's happening here.  There may be a simpler way to implement/test
         // this but I'm not certain of it at the moment
-        list($reporter, $validator) = TestUtils\MethodRecorderContainer::getLastNRecorders(2);
-        $numberOfFixtureTestsFiles = 3; // Number of fake test files located in tests/fixtures/tests
-        $this->assertEquals($numberOfFixtureTestsFiles, $validator->callCountForMethod('pass'),
-            'validator defined in config not used by runner as expected');
+        list($reporter) = TestUtils\MethodRecorderContainer::getLastNRecorders(1);
         $this->assertEquals(1, $reporter->callCountForMethod('registerTestRunnerInitialization'),
             'testing initialization not registered with reporter defined in config as expected when running command');
         $this->assertEquals(1, $reporter->callCountForMethod('registerSuiteMetricsSummary'),
