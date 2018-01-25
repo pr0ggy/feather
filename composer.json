@@ -4,20 +4,20 @@
     "version": "0.4.1",
     "type": "library",
     "bin": ["./bin/kase"],
-    "link_autoloader": true,
     "keywords": ["php", "unit", "testing", "framework"],
-    "license": "GPL",
+    "license": "MIT",
     "require": {
         "php": ">=5.6.0",
         "symfony/console": "2.*",
         "equip/structure": "^1.1",
         "sebastian/comparator": "^1.2",
         "nette/finder": "^2.4",
-        "crazycodr/standard-exceptions": "^2.1"
+        "crazycodr/standard-exceptions": "^2.1",
+        "pr0ggy/kanta": "^0.1.0"
     },
     "require-dev": {
         "pr0ggy/nark": "^0.2.0",
-        "phpunit/phpunit": "^5.7"
+        "phpunit/phpunit": "^5.7"        
     },
     "autoload": {
         "psr-4" : {
@@ -25,7 +25,8 @@
         },
         "files": [
             "src/const.php",
-            "src/functions.php"
+            "src/functions.php",
+            "src/Utils/functions.php"
         ]
     },
     "autoload-dev": {

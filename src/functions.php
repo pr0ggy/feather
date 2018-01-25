@@ -4,6 +4,7 @@ namespace Kase;
 
 use Equip\Structure\UnorderedList;
 use Equip\Structure\Dictionary;
+use Exception;
 use RuntimeException;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -21,7 +22,6 @@ use RuntimeException;
 function runner($suiteDescription, ...$suiteTests)
 {
     return function ($testingResources) use ($suiteDescription, $suiteTests) {
-        $testValidator = $testingResources['validator'];
         $testReporter = $testingResources['reporter'];
         $metricsLogger = $testingResources['metricsLogger'];
 
@@ -29,7 +29,7 @@ function runner($suiteDescription, ...$suiteTests)
         $suiteMetrics = [
             'suiteDescription' => $suiteDescription,
             'passedTestCount' => 0,
-            'failedTests' => [],    // test description to validation exception map
+            'failedTests' => [],    // dict, <test description> => <validation exception>
             'skippedTests' => []    // list of skipped test descriptions
         ];
 
@@ -54,21 +54,18 @@ function runner($suiteDescription, ...$suiteTests)
         foreach ($testsToRun as $test) {
             try {
                 if ($test['runMode'] === TEST_MODE_SKIPPED) {
-                    throw new SkippedTestException();
+                    $suiteMetrics['skippedTests'][] = $test['description'];
+                    $testReporter->registerSkippedTest($test['description']);
+                    continue;
                 }
 
                 $testDefinition = $test['definition'];
-                $testDefinition($testValidator);
+                $testDefinition();
                 ++$suiteMetrics['passedTestCount'];
                 $testReporter->registerPassedTest($test['description']);
-            } catch (SkippedTestException $exception) {
-                $suiteMetrics['skippedTests'][] = $test['description'];
-                $testReporter->registerSkippedTest($test['description']);
-            } catch (ValidationFailureException $exception) {
+            } catch (Exception $exception) {
                 $suiteMetrics['failedTests'][$test['description']] = $exception;
                 $testReporter->registerFailedTest($test['description'], $exception);
-            } catch (\Exception $exception) {
-                $testReporter->registerUnexpectedException($exception);
             }
         }
 
@@ -84,7 +81,7 @@ function runner($suiteDescription, ...$suiteTests)
  *
  * @param  string   $description    the description of the test case
  * @param  callable $testDefinition the function representing the actual test case to execute
- * @return \Equip\Structure\Dictionary  a data map representing the test
+ * @return \Equip\Structure\Dictionary  a dictionary representing the test
  */
 function test($description, callable $testDefinition)
 {
@@ -97,7 +94,7 @@ function test($description, callable $testDefinition)
  *
  * @param  string   $description    the description of the test case
  * @param  callable $testDefinition the function representing the actual test case to execute
- * @return \Equip\Structure\Dictionary  a data map representing the test
+ * @return \Equip\Structure\Dictionary  a dictionary representing the test
  */
 function only($description, callable $testDefinition)
 {
@@ -109,7 +106,7 @@ function only($description, callable $testDefinition)
  *
  * @param  string   $description    the description of the test case
  * @param  callable $testDefinition the function representing the actual test case to execute
- * @return \Equip\Structure\Dictionary  a data map representing the test
+ * @return \Equip\Structure\Dictionary  a dictionary representing the test
  */
 function skip($description, callable $testDefinition)
 {

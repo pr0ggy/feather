@@ -1,12 +1,14 @@
 <?php
 
-namespace Kase;
+namespace Kase\Console;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use RuntimeException;
+use Kase\Validation;
+use Kase\Reporting;
 
 /**
  * Symfony component console command which defines the main Kase 'run' command usable from the
@@ -56,14 +58,14 @@ class RunKaseTestsCommand extends Command
         $config = [];
         $configPath = $input->getOption('config');
         if ($configPath) {
-            if (file_exists($configPath)) {
-                $config = require $configPath;
-                if (is_array($config) === false) {
-                    $output->writeln("Error: Specified config file does not return a key/value map\n\n");
-                    return;
-                }
-            } else {
+            if (is_file($configPath) === false) {
                 $output->writeln("Error: Could not find specified Kase config file: {$configPath}\n\n");
+                return;
+            }
+
+            $config = require $configPath;
+            if (is_array($config) === false) {
+                $output->writeln("Error: Specified config file does not return a key/value dictionary\n\n");
                 return;
             }
         }
@@ -81,8 +83,7 @@ class RunKaseTestsCommand extends Command
         // ----- SET UP TESTING RESOURCES ----------------------------------------------------------
         $metricsLog = [];
         $testingResources = [
-            'validator'     => (isset($config['validator']) ? $config['validator'] : new TestValidator()),
-            'reporter'      => (isset($config['reporter']) ? $config['reporter'] : new DefaultKaseCLIReporter($output)),
+            'reporter'      => (isset($config['reporter']) ? $config['reporter'] : new Reporting\DefaultKaseCLIReporter($output)),
             'metricsLogger' => function ($metricsToRecord) use (&$metricsLog) {
                 $metricsLog[] = $metricsToRecord;
             },

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "2daff20b6aa0fd1a6cef2ee0dba84325",
+    "content-hash": "edf7a164484931783f2b4d62bba54c92",
     "packages": [
         {
             "name": "crazycodr/standard-exceptions",
@@ -157,16 +157,16 @@
         },
         {
             "name": "nette/utils",
-            "version": "v2.4.5",
+            "version": "v2.4.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/utils.git",
-                "reference": "28ad4e2a6dcf143c23bde969a825f10a5d513602"
+                "reference": "266160aec0d99516e0ea510de1dfa24a0dc1e76e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/utils/zipball/28ad4e2a6dcf143c23bde969a825f10a5d513602",
-                "reference": "28ad4e2a6dcf143c23bde969a825f10a5d513602",
+                "url": "https://api.github.com/repos/nette/utils/zipball/266160aec0d99516e0ea510de1dfa24a0dc1e76e",
+                "reference": "266160aec0d99516e0ea510de1dfa24a0dc1e76e",
                 "shasum": ""
             },
             "require": {
@@ -185,8 +185,7 @@
                 "ext-intl": "for script transliteration in Strings::webalize() and toAscii()",
                 "ext-json": "to use Nette\\Utils\\Json",
                 "ext-mbstring": "to use Strings::lower() etc...",
-                "ext-xml": "to use Strings::length() etc. when mbstring is not available",
-                "https://nette.org/donate": "\u001b[1;37;42m Please consider supporting Nette via a donation \u001b[0m"
+                "ext-xml": "to use Strings::length() etc. when mbstring is not available"
             },
             "type": "library",
             "extra": {
@@ -217,7 +216,52 @@
             ],
             "description": "Nette Utility Classes",
             "homepage": "https://nette.org",
-            "time": "2017-03-29T16:55:54+00:00"
+            "time": "2017-04-26T10:04:49+00:00"
+        },
+        {
+            "name": "pr0ggy/kanta",
+            "version": "0.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pr0ggy/kanta.git",
+                "reference": "998c5fec6749ebcd79fb76303d99dd3402acb9b2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pr0ggy/kanta/zipball/998c5fec6749ebcd79fb76303d99dd3402acb9b2",
+                "reference": "998c5fec6749ebcd79fb76303d99dd3402acb9b2",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6.0",
+                "sebastian/comparator": "^1.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Kanta\\Validation\\": "lib/"
+                },
+                "files": [
+                    "lib/functions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL"
+            ],
+            "description": "An easy-to-use, exception-based functional assertion library for PHP 5.6 and later",
+            "keywords": [
+                "assert",
+                "assertion",
+                "php",
+                "testing",
+                "unit",
+                "validation"
+            ],
+            "time": "2017-05-13T03:11:56+00:00"
         },
         {
             "name": "psr/log",
@@ -504,16 +548,16 @@
         },
         {
             "name": "symfony/console",
-            "version": "v2.8.19",
+            "version": "v2.8.20",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "86407ff20855a5eaa2a7219bd815e9c40a88633e"
+                "reference": "2cfcbced8e39e2313ed4da8896fc8c59a56c0d7e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/86407ff20855a5eaa2a7219bd815e9c40a88633e",
-                "reference": "86407ff20855a5eaa2a7219bd815e9c40a88633e",
+                "url": "https://api.github.com/repos/symfony/console/zipball/2cfcbced8e39e2313ed4da8896fc8c59a56c0d7e",
+                "reference": "2cfcbced8e39e2313ed4da8896fc8c59a56c0d7e",
                 "shasum": ""
             },
             "require": {
@@ -561,7 +605,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2017-04-03T20:37:06+00:00"
+            "time": "2017-04-26T01:38:53+00:00"
         },
         {
             "name": "symfony/debug",
@@ -1426,16 +1470,16 @@
         },
         {
             "name": "pr0ggy/nark",
-            "version": "0.2.8",
+            "version": "0.2.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pr0ggy/nark.git",
-                "reference": "f744ba9f76c16d8a7d9232ffee5cfed3a0d3ba59"
+                "reference": "1ae90423387ffb2418e8d9cd59ea31a547641f3b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pr0ggy/nark/zipball/f744ba9f76c16d8a7d9232ffee5cfed3a0d3ba59",
-                "reference": "f744ba9f76c16d8a7d9232ffee5cfed3a0d3ba59",
+                "url": "https://api.github.com/repos/pr0ggy/nark/zipball/1ae90423387ffb2418e8d9cd59ea31a547641f3b",
+                "reference": "1ae90423387ffb2418e8d9cd59ea31a547641f3b",
                 "shasum": ""
             },
             "require": {
@@ -1471,7 +1515,7 @@
                 "testing",
                 "unit"
             ],
-            "time": "2017-03-14T22:30:45+00:00"
+            "time": "2017-05-02T23:16:07+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
@@ -1752,16 +1796,16 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v3.2.7",
+            "version": "v3.2.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "62b4cdb99d52cb1ff253c465eb1532a80cebb621"
+                "reference": "acec26fcf7f3031e094e910b94b002fa53d4e4d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/62b4cdb99d52cb1ff253c465eb1532a80cebb621",
-                "reference": "62b4cdb99d52cb1ff253c465eb1532a80cebb621",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/acec26fcf7f3031e094e910b94b002fa53d4e4d6",
+                "reference": "acec26fcf7f3031e094e910b94b002fa53d4e4d6",
                 "shasum": ""
             },
             "require": {
@@ -1803,7 +1847,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2017-03-20T09:45:15+00:00"
+            "time": "2017-05-01T14:55:58+00:00"
         },
         {
             "name": "webmozart/assert",
