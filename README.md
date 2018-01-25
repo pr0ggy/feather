@@ -105,4 +105,4 @@ any exception-based validation/assertion library you like.
 	./vendor/bin/phpunit
 
 ## License
-**GPL-3**
+**MIT**
